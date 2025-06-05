@@ -1,0 +1,76 @@
+CREATE DATABASE IF NOT EXISTS paseaperros;
+USE paseaperros;
+
+-- Tabla: administrador
+CREATE TABLE administrador (
+    id_admin INT PRIMARY KEY,
+    nombre VARCHAR(45),
+    correo VARCHAR(45),
+    clave VARCHAR(45),
+    telefono INT
+);
+
+-- Tabla: dueño
+CREATE TABLE dueño (
+    id_dueño INT PRIMARY KEY,
+    nombre VARCHAR(45),
+    correo VARCHAR(45),
+    clave VARCHAR(45),
+    telefono INT
+);
+
+-- Tabla: estado_paseador
+CREATE TABLE estado_paseador (
+    id_estado INT PRIMARY KEY,
+    estado VARCHAR(45) NOT NULL
+);
+
+-- Tabla: paseador
+CREATE TABLE paseador (
+    id_pas INT PRIMARY KEY,
+    nombre VARCHAR(45),
+    correo VARCHAR(45),
+    clave VARCHAR(45),
+    telefono INT,
+    foto_url TEXT,
+    id_estado INT,
+    FOREIGN KEY (id_estado) REFERENCES estado_paseador(id_estado)
+);
+
+-- Tabla: perro
+CREATE TABLE perro (
+    id_perro INT PRIMARY KEY,
+    nombre VARCHAR(45),
+    raza VARCHAR(45),
+    foto_url TEXT,
+    id_dueño INT,
+    FOREIGN KEY (id_dueño) REFERENCES dueño(id_dueño)
+);
+
+-- Tabla: paseo
+CREATE TABLE paseo (
+    id_paseo INT PRIMARY KEY,
+    tarifa DECIMAL(10,2),
+    fecha DATE,
+    hora TIME,
+    id_pas INT,
+    FOREIGN KEY (id_pas) REFERENCES paseador(id_pas)
+);
+
+-- Tabla intermedia: paseo_perro
+CREATE TABLE paseo_perro (
+    id_paseo INT,
+    id_perro INT,
+    PRIMARY KEY (id_paseo, id_perro),
+    FOREIGN KEY (id_paseo) REFERENCES paseo(id_paseo),
+    FOREIGN KEY (id_perro) REFERENCES perro(id_perro)
+);
+
+-- Tabla: factura
+CREATE TABLE factura (
+    id_factura INT PRIMARY KEY,
+    fecha DATE,
+    valor DECIMAL(12,2),
+    id_paseo INT,
+    FOREIGN KEY (id_paseo) REFERENCES paseo(id_paseo)
+);
