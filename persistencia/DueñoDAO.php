@@ -26,4 +26,11 @@ class DueñoDAO {
                 FROM dueño
                 WHERE id_dueño = '" . $this->id_dueño . "'";
     }
+    
+    public function consultarTodos() {
+        return "SELECT id_dueño, nombre, correo, telefono FROM dueño";
+    }
+        
+
+
 }

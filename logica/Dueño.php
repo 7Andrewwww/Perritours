@@ -37,4 +37,23 @@ class Dueño extends Persona {
         $this->telefono = $datos[2];
         $conexion->cerrar();
     }
+    
+    public static function consultarTodos() {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        
+        $dao = new DueñoDAO();
+        $conexion->ejecutar($dao->consultarTodos());
+        
+        $dueños = [];
+        while (($registro = $conexion->registro())) {
+            $dueños[] = new Dueño($registro[0], $registro[1], $registro[2], "", $registro[3]);
+        }
+        
+        $conexion->cerrar();
+        return $dueños;
+    }
+    
+    
+
 }
