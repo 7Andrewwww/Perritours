@@ -130,8 +130,10 @@ class Paseador extends Persona {
         }
         
         $resultado = $conexion->ejecutar($paseadorDAO->actualizar());
+        $filasAfectadas = $conexion->filasAfectadas(); 
         $conexion->cerrar();
-        return $resultado;
+        
+        return $filasAfectadas > 0; 
     }
     
     public function actualizarClave($nuevaClave) {
@@ -143,22 +145,13 @@ class Paseador extends Persona {
         $conexion->cerrar();
         return $resultado;
     }
-
-    public function eliminar() {
+    
+    public function verificarClave($claveIngresada) {
         $conexion = new Conexion();
-        $paseadorDAO = new PaseadorDAO($this->id);
-        
+        $paseadorDAO = new PaseadorDAO("", "", $this->correo, $claveIngresada);
         $conexion->abrir();
-        
-        $conexion->ejecutar("SELECT foto_url FROM paseador WHERE id_pas = '" . $this->id . "'");
-        $foto_url = $conexion->registro()[0];
-        
-        $resultado = $conexion->ejecutar($paseadorDAO->eliminar());
-        
-        if($resultado && $foto_url != 'img/default-profile.png' && file_exists($foto_url)) {
-            unlink($foto_url); 
-        }
-        
+        $conexion->ejecutar($paseadorDAO->autenticar());
+        $resultado = ($conexion->filas() == 1);
         $conexion->cerrar();
         return $resultado;
     }

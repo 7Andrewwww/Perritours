@@ -27,7 +27,6 @@ $id = $_SESSION["id"];
                         <li><a class="dropdown-item text-light" href="?pid=<?php echo base64_encode("presentacion/paseador/crearPaseador.php") ?>">Crear Paseador</a></li>
                         <li><a class="dropdown-item text-light" href="?pid=<?php echo base64_encode("presentacion/paseador/consultarPaseador.php") ?>">Consultar Paseadores</a></li>
                         <li><a class="dropdown-item text-light" href="?pid=<?php echo base64_encode("presentacion/paseador/editarPaseador.php") ?>">Editar Paseadores</a></li>
-                        <li><a class="dropdown-item text-light" href="?pid=<?php echo base64_encode("presentacion/paseador/eliminarPaseador.php") ?>">Eliminar Paseadores</a></li>
                     </ul>
                 </li>
 

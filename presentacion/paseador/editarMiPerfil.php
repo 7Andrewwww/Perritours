@@ -1,5 +1,5 @@
 <?php
-if ($_SESSION["rol"] != "admin") {
+if ($_SESSION["rol"] != "paseador") {
     header("Location: ?pid=" . base64_encode("presentacion/noAutorizado.php"));
     exit();
 }
@@ -8,21 +8,18 @@ $mensaje = "";
 $error = "";
 $paseador = null;
 
-if(isset($_GET['idPaseador']) && !empty($_GET['idPaseador'])) {
-    $paseador = new Paseador($_GET['idPaseador']);
-    
-    try {
-        $paseador->consultar();
+$idPaseador = $_SESSION["id"];
 
-        if(empty($paseador->getNombre())) {
-            throw new Exception("Paseador no encontrado");
-        }
-    } catch (Exception $e) {
-        $error = $e->getMessage();
-        $paseador = null;
+try {
+    $paseador = new Paseador($idPaseador);
+    $paseador->consultar();
+
+    if(empty($paseador->getNombre())) {
+        throw new Exception("Perfil no encontrado");
     }
-} else {
-    $error = "No se ha especificado un paseador para editar";
+} catch (Exception $e) {
+    $error = $e->getMessage();
+    $paseador = null;
 }
 
 if(isset($_POST['actualizar']) && $paseador !== null) {
@@ -43,7 +40,7 @@ if(isset($_POST['actualizar']) && $paseador !== null) {
             
             if(in_array($tipoArchivo, $extensionesPermitidas)) {
                 if(move_uploaded_file($_FILES['foto']['tmp_name'], $rutaCompleta)) {
-
+                    
                     if($foto_url != 'img/default-profile.png' && file_exists($foto_url)) {
                         unlink($foto_url);
                     }
@@ -55,17 +52,17 @@ if(isset($_POST['actualizar']) && $paseador !== null) {
                 throw new Exception("Solo se permiten archivos JPG, JPEG, PNG o GIF");
             }
         }
-
+        
         $paseador->setNombre($_POST['nombre']);
         $paseador->setCorreo($_POST['correo']);
         $paseador->setTelefono($_POST['telefono']);
         $paseador->setFotoUrl($foto_url);
-        $paseador->setEstado(new Estado($_POST['estado'], ""));
+ 
         
         if($paseador->actualizar()) {
-            $mensaje = "Paseador actualizado exitosamente";
+            $mensaje = "Perfil actualizado exitosamente";
         } else {
-            $error = "Error al actualizar el paseador";
+            $error = "Error al actualizar el perfil";
         }
     } catch (Exception $e) {
         $error = $e->getMessage();
@@ -74,12 +71,16 @@ if(isset($_POST['actualizar']) && $paseador !== null) {
 
 if(isset($_POST['actualizarClave']) && $paseador !== null) {
     try {
-        if(empty($_POST['nuevaClave']) || empty($_POST['confirmarClave'])) {
-            throw new Exception("Ambos campos de contraseña son requeridos");
+        if(empty($_POST['claveActual']) || empty($_POST['nuevaClave']) || empty($_POST['confirmarClave'])) {
+            throw new Exception("Todos los campos de contraseña son requeridos");
+        }
+        
+        if(!$paseador->verificarClave($_POST['claveActual'])) {
+            throw new Exception("La contraseña actual es incorrecta");
         }
         
         if($_POST['nuevaClave'] != $_POST['confirmarClave']) {
-            throw new Exception("Las contraseñas no coinciden");
+            throw new Exception("Las nuevas contraseñas no coinciden");
         }
         
         $paseador->actualizarClave($_POST['nuevaClave']);
@@ -94,11 +95,11 @@ if(isset($_POST['actualizarClave']) && $paseador !== null) {
     <?php
     include ("presentacion/fondo.php");
     include ("presentacion/boton.php");
-    include("presentacion/admin/menuAdmin.php");
+    include("presentacion/paseador/menuPaseador.php");
     ?>
     <div class="text-center py-3 hero-text">
         <div class="container glass py-3">
-            <h1 class="display-6">Editar Paseador</h1>
+            <h1 class="display-6">Mi Perfil</h1>
             
             <?php if($mensaje != ""): ?>
                 <div class="alert alert-success"><?php echo $mensaje ?></div>
@@ -111,12 +112,10 @@ if(isset($_POST['actualizarClave']) && $paseador !== null) {
             <?php if($paseador !== null): ?>
                 <div class="card mx-auto" style="max-width: 40rem; background-color: transparent; border: 3px solid blueviolet;">
                     <div style="border-bottom: 2px dashed blueviolet;" class="card-header display-6 text-light">
-                        Datos del Paseador
+                        Mis Datos
                     </div>
                     <div class="card-body text-light">
-                        <form method="post" action="?pid=<?php echo base64_encode("presentacion/paseador/editarPaseador.php") ?>&idPaseador=<?php echo $paseador->getId() ?>" enctype="multipart/form-data">
-                            <input type="hidden" name="id" value="<?php echo $paseador->getId() ?>">
-                            
+                        <form method="post" action="?pid=<?php echo base64_encode("presentacion/paseador/editarMiPerfil.php") ?>" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label for="nombre" class="form-label">Nombre Completo</label>
                                 <input type="text" class="form-control" id="nombre" name="nombre" value="<?php echo htmlspecialchars($paseador->getNombre()) ?>" required>
@@ -133,7 +132,7 @@ if(isset($_POST['actualizarClave']) && $paseador !== null) {
                             </div>
                             
                             <div class="mb-3">
-                                <label for="foto" class="form-label">Foto del Paseador</label>
+                                <label for="foto" class="form-label">Foto de Perfil</label>
                                 <input type="file" class="form-control" id="foto" name="foto" accept="image/*">
                                 <div class="form-text">Formatos aceptados: JPG, PNG, GIF. Dejar en blanco para mantener la actual.</div>
                                 <?php if($paseador->getFotoUrl()): ?>
@@ -141,32 +140,26 @@ if(isset($_POST['actualizarClave']) && $paseador !== null) {
                                 <?php endif; ?>
                             </div>
                             
-                            <div class="mb-3">
-                                <label for="estado" class="form-label">Estado</label>
-                                <select class="form-select" id="estado" name="estado" required>
-                                    <option value="1" <?php echo $paseador->getEstado()->getIdEstado() == 1 ? 'selected' : '' ?>>Activo</option>
-                                    <option value="2" <?php echo $paseador->getEstado()->getIdEstado() == 2 ? 'selected' : '' ?>>Inactivo</option>
-                                    <option value="3" <?php echo $paseador->getEstado()->getIdEstado() == 3 ? 'selected' : '' ?>>Suspendido</option>
-                                    <option value="4" <?php echo $paseador->getEstado()->getIdEstado() == 4 ? 'selected' : '' ?>>Vacacionando</option>
-                                    <option value="4" <?php echo $paseador->getEstado()->getIdEstado() == 5 ? 'selected' : '' ?>>Inhabilitado</option>
-                                </select>
-                            </div>
-                            
-                            <button type="submit" name="actualizar" class="btn btn-primary">Actualizar Datos</button>
+                            <button type="submit" name="actualizar" class="btn btn-primary">Actualizar Mis Datos</button>
                         </form>
                         
                         <hr class="my-4" style="border-color: blueviolet;">
                         
                         <h5 class="mt-4">Cambiar Contraseña</h5>
-                        <form method="post" action="?pid=<?php echo base64_encode("presentacion/paseador/editarPaseador.php") ?>&idPaseador=<?php echo $paseador->getId() ?>">
+                        <form method="post" action="?pid=<?php echo base64_encode("presentacion/paseador/editarMiPerfil.php") ?>">
                             <div class="mb-3">
-                                <label for="nuevaClave" class="form-label">Nueva Contraseña</label>
-                                <input type="password" class="form-control" id="nuevaClave" name="nuevaClave">
+                                <label for="claveActual" class="form-label">Contraseña Actual</label>
+                                <input type="password" class="form-control" id="claveActual" name="claveActual" required>
                             </div>
                             
                             <div class="mb-3">
-                                <label for="confirmarClave" class="form-label">Confirmar Contraseña</label>
-                                <input type="password" class="form-control" id="confirmarClave" name="confirmarClave">
+                                <label for="nuevaClave" class="form-label">Nueva Contraseña</label>
+                                <input type="password" class="form-control" id="nuevaClave" name="nuevaClave" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="confirmarClave" class="form-label">Confirmar Nueva Contraseña</label>
+                                <input type="password" class="form-control" id="confirmarClave" name="confirmarClave" required>
                             </div>
                             
                             <button type="submit" name="actualizarClave" class="btn btn-warning">Cambiar Contraseña</button>
@@ -174,10 +167,9 @@ if(isset($_POST['actualizarClave']) && $paseador !== null) {
                     </div>
                 </div>
             <?php else: ?>
-                <div class="alert alert-info">
-                    No se puede mostrar el formulario de edición. Por favor, seleccione un paseador válido desde la lista.
+                <div class="alert alert-danger">
+                    Error al cargar tu perfil. Por favor, contacta al administrador.
                 </div>
-                <a href="?pid=<?php echo base64_encode("presentacion/paseador/consultarPaseador.php") ?>" class="btn btn-primary mt-3">Volver a la lista de paseadores</a>
             <?php endif; ?>
         </div>
     </div>
