@@ -1,0 +1,38 @@
+# Archivos y carpetas de Eclipse
+.settings/
+.project
+.classpath
+
+# Archivos y carpetas de VS Code
+.vscode/
+
+# Archivos temporales del sistema
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+
+# Archivos de entorno local
+.env
+.env.local
+
+# Cache de composer y vendor
+vendor/
+composer.lock
+
+# Cache de PHPUnit
+.phpunit.result.cache
+
+# Cache general
+cache/
+tmp/
+
+# Archivos generados automáticamente
+*.swp
+*.swo
+
+# Node modules (si usas JavaScript en tu proyecto)
+node_modules/
+
+# Ignorar todos los archivos que no quieras subir

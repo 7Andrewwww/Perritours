@@ -86,22 +86,27 @@ class Paseador extends Persona {
             );
         
         $conexion->abrir();
-
-        $conexion->ejecutar("SELECT id_pas FROM paseador WHERE id_pas = '" . $this->id . "'");
-        if($conexion->filas() > 0) {
-            $conexion->cerrar();
-            throw new Exception("El ID del paseador ya existe");
+        
+        try{
+            $conexion->ejecutar("SELECT id_pas FROM paseador WHERE id_pas = '" . $this->id . "'");
+            if($conexion->filas() > 0) {
+                $conexion->cerrar();
+                throw new Exception("El ID del paseador ya existe");
+            }
+            
+            $conexion->ejecutar("SELECT id_pas FROM paseador WHERE correo = '" . $this->correo . "'");
+            if($conexion->filas() > 0) {
+                $conexion->cerrar();
+                throw new Exception("El correo electrónico ya está registrado");
+            }
+            $conexion->ejecutar($paseadorDAO->crear());
+            $resultado = true;
+            
+        }catch(Exception){
+            $resultado = false;
+        }finally{
+            return $resultado;
         }
-
-        $conexion->ejecutar("SELECT id_pas FROM paseador WHERE correo = '" . $this->correo . "'");
-        if($conexion->filas() > 0) {
-            $conexion->cerrar();
-            throw new Exception("El correo electrónico ya está registrado");
-        }
-
-        $resultado = $conexion->ejecutar($paseadorDAO->crear());
-        $conexion->cerrar();
-        return $resultado;
     }
 
     public function actualizar() {
