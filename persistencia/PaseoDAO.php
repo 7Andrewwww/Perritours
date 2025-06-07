@@ -29,12 +29,58 @@ class PaseoDAO {
                 ORDER BY p.fecha DESC, p.hora DESC";
     }
     
-    public function consultar() {
+    public function consultarPaseosProgramados($id_pas) {
+        return "SELECT p.id_paseo, p.tarifa, p.fecha, p.hora
+                FROM paseo p
+                WHERE p.id_pas = " . $id_pas . "
+                AND (p.fecha > CURDATE() OR (p.fecha = CURDATE() AND p.hora > CURTIME()))
+                ORDER BY p.fecha ASC, p.hora ASC";
+    }
+    
+    public function consultarHistorialPaseos($id_pas) {
+        return "SELECT p.id_paseo, p.tarifa, p.fecha, p.hora
+                FROM paseo p
+                WHERE p.id_pas = " . $id_pas . "
+                AND (p.fecha < CURDATE() OR (p.fecha = CURDATE() AND p.hora <= CURTIME()))
+                ORDER BY p.fecha DESC, p.hora DESC";
+    }
+    
+    public function consultarDetallePaseo($id_paseo) {
         return "SELECT p.id_paseo, p.tarifa, p.fecha, p.hora,
-                       pa.id_pas, pa.nombre as nombre_paseador
+                       pa.id_pas, pa.nombre as nombre_paseador, pa.foto_url as foto_paseador,
+                       d.id_dueño, d.nombre as nombre_dueño, d.telefono as telefono_dueño,
+                       per.id_perro, per.nombre as nombre_perro, per.raza, per.foto_url as foto_perro
                 FROM paseo p
                 JOIN paseador pa ON p.id_pas = pa.id_pas
+                JOIN paseo_perro pp ON p.id_paseo = pp.id_paseo
+                JOIN perro per ON pp.id_perro = per.id_perro
+                JOIN dueño d ON per.id_dueño = d.id_dueño
                 WHERE p.id_paseo = " . $this->id_paseo;
+    }
+    
+    public function calificarPaseo($id_paseo, $id_paseador, $puntuacion) {
+        return "INSERT INTO calificacion_paseo
+            (id_paseo, id_paseador, puntuacion_paseador, fecha_paseador, id_dueño)
+            SELECT
+                $id_paseo,
+                $id_paseador,
+                $puntuacion,
+                NOW(),
+                d.id_dueño
+            FROM paseo p
+            JOIN paseo_perro pp ON p.id_paseo = pp.id_paseo
+            JOIN perro per ON pp.id_perro = per.id_perro
+            JOIN dueño d ON per.id_dueño = d.id_dueño
+            WHERE p.id_paseo = $id_paseo
+            ON DUPLICATE KEY UPDATE
+                puntuacion_paseador = VALUES(puntuacion_paseador),
+                fecha_paseador = VALUES(fecha_paseador)";
+    }
+    
+    public function obtenerCalificacionPaseador($id_paseo, $id_paseador) {
+        return "SELECT puntuacion_paseador
+            FROM calificacion_paseo
+            WHERE id_paseo = $id_paseo AND id_paseador = $id_paseador";
     }
 }
 ?>

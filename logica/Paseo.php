@@ -9,16 +9,19 @@ class Paseo {
     private $fecha;
     private $hora;
     private $paseador;
+    private $dueño;
+    private $perro;
     
-    public function __construct($idPaseo = "", $tarifa = 0, $fecha = "", $hora = "", $paseador = "") {
+    public function __construct($idPaseo = "", $tarifa = 0, $fecha = "", $hora = "", $paseador = null, $dueño = null, $perro = null) {
         $this->idPaseo = $idPaseo;
         $this->tarifa = $tarifa;
         $this->fecha = $fecha;
         $this->hora = $hora;
         $this->paseador = $paseador;
+        $this->dueño = $dueño;
+        $this->perro = $perro;
     }
-    
-    // Getters
+
     public function getIdPaseo() {
         return $this->idPaseo;
     }
@@ -39,28 +42,14 @@ class Paseo {
         return $this->paseador;
     }
     
-    // Setters
-    public function setIdPaseo($idPaseo) {
-        $this->idPaseo = $idPaseo;
+    public function getDueño() {
+        return $this->dueño;
     }
     
-    public function setTarifa($tarifa) {
-        $this->tarifa = $tarifa;
+    public function getPerro() {
+        return $this->perro;
     }
     
-    public function setFecha($fecha) {
-        $this->fecha = $fecha;
-    }
-    
-    public function setHora($hora) {
-        $this->hora = $hora;
-    }
-    
-    public function setPaseador($paseador) {
-        $this->paseador = $paseador;
-    }
-    
-    // Métodos de negocio
     public static function consultarTodos() {
         $conexion = new Conexion();
         $paseoDAO = new PaseoDAO();
@@ -87,15 +76,106 @@ class Paseo {
         $conexion = new Conexion();
         $paseoDAO = new PaseoDAO($this->idPaseo);
         $conexion->abrir();
-        $conexion->ejecutar($paseoDAO->consultar());
+        $conexion->ejecutar($paseoDAO->consultarDetallePaseo($this->idPaseo));
         
         $datos = $conexion->registro();
         $this->tarifa = $datos[1];
         $this->fecha = $datos[2];
         $this->hora = $datos[3];
-        $this->paseador = new Paseador($datos[4], $datos[5]);
+        $this->paseador = new Paseador(
+            $datos[4],
+            $datos[5],
+            "", "", "",
+            $datos[6]
+            );
+        $this->dueño = new Dueño(
+            $datos[7],
+            $datos[8],
+            "", "",
+            $datos[9]
+            );
+        $this->perro = new Perro(
+            $datos[10],
+            $datos[11],
+            $datos[12],
+            $datos[13]
+            );
         
         $conexion->cerrar();
+    }
+
+    public static function consultarPaseosProgramados($idPaseador, $mes = null, $anio = null) {
+        $filtroFecha = "";
+        if ($mes && $anio) {
+            $filtroFecha = "AND MONTH(p.fecha) = $mes AND YEAR(p.fecha) = $anio";
+        }
+        
+        $sql = "SELECT p.id_paseo, p.tarifa, p.fecha, p.hora
+            FROM paseo p
+            WHERE p.id_pas = $idPaseador
+            $filtroFecha
+            AND (p.fecha > CURDATE() OR (p.fecha = CURDATE() AND p.hora > CURTIME()))
+            ORDER BY p.fecha ASC, p.hora ASC";
+            
+            $conexion = new Conexion();
+            $conexion->abrir();
+            $conexion->ejecutar($sql);
+            
+            $paseos = array();
+            while ($datos = $conexion->registro()) {
+                $paseo = new Paseo($datos[0], $datos[1], $datos[2], $datos[3]);
+                array_push($paseos, $paseo);
+            }
+            
+            $conexion->cerrar();
+            return $paseos;
+    }
+    
+    public static function consultarHistorialPaseos($idPaseador) {
+        $conexion = new Conexion();
+        $paseoDAO = new PaseoDAO();
+        $conexion->abrir();
+        $conexion->ejecutar($paseoDAO->consultarHistorialPaseos($idPaseador));
+        
+        $paseos = array();
+        while($datos = $conexion->registro()) {
+            $paseo = new Paseo(
+                $datos[0],
+                $datos[1],
+                $datos[2],
+                $datos[3]
+                );
+            array_push($paseos, $paseo);
+        }
+        
+        $conexion->cerrar();
+        return $paseos;
+    }
+    
+    public function calificar($puntuacion, $idPaseador) {
+        $conexion = new Conexion();
+        $paseoDAO = new PaseoDAO($this->idPaseo);
+        $conexion->abrir();
+        $resultado = $conexion->ejecutar(
+            $paseoDAO->calificarPaseo($this->idPaseo, $idPaseador, $puntuacion)
+            );
+        $conexion->cerrar();
+        return $resultado;
+    }
+    
+    public function obtenerCalificacionPaseador($idPaseador) {
+        $conexion = new Conexion();
+        $paseoDAO = new PaseoDAO($this->idPaseo);
+        $conexion->abrir();
+        $conexion->ejecutar($paseoDAO->obtenerCalificacionPaseador($this->idPaseo, $idPaseador));
+        
+        $calificacion = null;
+        if ($datos = $conexion->registro()) {
+            $calificacion = $datos[0];
+        }
+        
+        $conexion->cerrar();
+        return $calificacion;
     }
 }
 ?>

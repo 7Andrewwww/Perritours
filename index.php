@@ -41,9 +41,14 @@ $paginas_con_autenticacion = array(
     "presentacion/paseador/consultarPaseador.php",
     "presentacion/paseador/editarPaseador.php",
     "presentacion/paseador/editarMiPerfil.php",
+    "presentacion/paseador/guardarCalificacion.php",
+    "presentacion/paseador/gestionHorario.php",
     "presentacion/dueño/consultarDueño.php",
     "presentacion/perro/consultarPerro.php",
     "presentacion/paseito/consultarPaseo.php",
+    "presentacion/paseito/consultarPaseoPaseador.php",
+    "presentacion/paseito/historialPaseos.php",
+    "presentacion/paseador/detallePaseo.php",
 );
 
 if(!isset($_GET["pid"])){

@@ -47,6 +47,26 @@ CREATE TABLE perro (
     FOREIGN KEY (id_dueño) REFERENCES dueño(id_dueño)
 );
 
+CREATE TABLE calificacion_paseo (
+    id_calificacion INT PRIMARY KEY AUTO_INCREMENT,
+    id_paseo INT NOT NULL,
+    
+    -- Datos del paseador
+    id_paseador INT NOT NULL,
+    puntuacion_paseador TINYINT, -- Sin CHECK
+    fecha_paseador TIMESTAMP NULL,
+    
+    -- Datos del dueño
+    id_dueño INT NOT NULL,
+    puntuacion_dueño TINYINT, -- Sin CHECK
+    comentario_dueño TEXT,
+    fecha_dueño TIMESTAMP NULL,
+    
+    FOREIGN KEY (id_paseo) REFERENCES paseo(id_paseo),
+    FOREIGN KEY (id_paseador) REFERENCES paseador(id_pas),
+    FOREIGN KEY (id_dueño) REFERENCES dueño(id_dueño)
+);
+
 -- Tabla: paseo
 CREATE TABLE paseo (
     id_paseo INT PRIMARY KEY,
