@@ -70,5 +70,47 @@ class PaseadorDAO {
         return "DELETE FROM paseador WHERE id_pas = '" . $this->id_pas . "'";
     }
     
+    public function siguienteId() {
+        return "SELECT MAX(id_pas) + 1 FROM paseador";
+    }
+    
+    public function consultarPaseadoresActivos() {
+        return "SELECT
+                p.id_pas,
+                p.nombre,
+                p.correo,
+                p.telefono,
+                p.foto_url,
+                p.id_estado,
+                e.estado
+            FROM paseador p
+            JOIN estado_paseador e ON p.id_estado = e.id_estado
+            WHERE e.estado = 'Activo'
+            ORDER BY p.nombre";
+    }
+    
+    public function consultarPaseadoresConExperiencia($idDueño) {
+        return "SELECT DISTINCT
+                p.id_pas,
+                p.nombre,
+                p.correo,
+                p.telefono,
+                p.foto_url,
+                p.id_estado,
+                e.estado
+            FROM paseador p
+            JOIN estado_paseador e ON p.id_estado = e.id_estado
+            JOIN paseo pa ON p.id_pas = pa.id_pas
+            JOIN paseo_perro pp ON pa.id_paseo = pp.id_paseo
+            JOIN perro pe ON pp.id_perro = pe.id_perro
+            WHERE pe.raza IN (
+                SELECT DISTINCT raza
+                FROM perro
+                WHERE id_dueño = $idDueño
+            )
+            AND e.estado = 'Activo'
+            ORDER BY p.nombre";
+    }
+    
 }
 ?>

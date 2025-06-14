@@ -155,5 +155,68 @@ class Paseador extends Persona {
         $conexion->cerrar();
         return $resultado;
     }
+    
+    public static function siguienteId() {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        
+        $paseadorDAO = new PaseadorDAO();
+        $conexion->ejecutar($paseadorDAO->siguienteId());
+        
+        $nextId = $conexion->registro()[0] ?? 1;
+        $conexion->cerrar();
+        
+        return $nextId;
+    }
+    
+    public static function consultarPaseadoresActivos() {
+        $conexion = new Conexion();
+        $paseadorDAO = new PaseadorDAO();
+        
+        $conexion->abrir();
+        $conexion->ejecutar($paseadorDAO->consultarPaseadoresActivos());
+        
+        $paseadores = array();
+        while($datos = $conexion->registro()) {
+            $paseador = new Paseador(
+                $datos[0],  // id_pas
+                $datos[1],  // nombre
+                $datos[2],  // correo
+                "",         // clave (no se necesita)
+                $datos[3],  // telefono
+                $datos[4],  // foto_url
+                new Estado($datos[5], $datos[6]) // id_estado, estado
+                );
+            array_push($paseadores, $paseador);
+        }
+        
+        $conexion->cerrar();
+        return $paseadores;
+    }
+    
+    public static function consultarPaseadoresConExperiencia($idDueño) {
+        $conexion = new Conexion();
+        $paseadorDAO = new PaseadorDAO();
+        
+        $conexion->abrir();
+        $conexion->ejecutar($paseadorDAO->consultarPaseadoresConExperiencia($idDueño));
+        
+        $paseadores = array();
+        while($datos = $conexion->registro()) {
+            $paseador = new Paseador(
+                $datos[0],  // id_pas
+                $datos[1],  // nombre
+                $datos[2],  // correo
+                "",         // clave (no se necesita)
+                $datos[3],  // telefono
+                $datos[4],  // foto_url
+                new Estado($datos[5], $datos[6]) // id_estado, estado
+                );
+            array_push($paseadores, $paseador);
+        }
+        
+        $conexion->cerrar();
+        return $paseadores;
+    }
 }
 ?>

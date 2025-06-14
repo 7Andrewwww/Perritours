@@ -27,7 +27,7 @@ if ($_SESSION["rol"] != "admin") {
                     <p class="card-text lead"><strong>Rol: </strong>Admin</p>
                     <p class="lead"><strong>Teléfono: </strong><?php echo $admin->getTelefono() ?></p>
                     <p class="lead"><strong>Correo: </strong><?php echo $admin->getCorreo() ?></p>
-                    <p class="lead" style="color: blueviolet">Consulta los usuarios, paseos y estadisticas en el <i>Menú</i>.</p>
+                    <p class="lead" style="color: #4CAF50">Consulta los usuarios, paseos y estadisticas en el <i>Menú</i>.</p>
                 </div>
             </div>
         </div>

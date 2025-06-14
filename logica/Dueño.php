@@ -54,6 +54,56 @@ class Dueño extends Persona {
         return $dueños;
     }
     
+    public function actualizarInformacion() {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        
+        // Verificar si el correo ya existe en otro dueño
+        $this->dueñoDAO = new DueñoDAO($this->id, "", $this->correo);
+        $conexion->ejecutar($this->dueñoDAO->verificarCorreoExistente());
+        if($conexion->filas() > 0) {
+            $conexion->cerrar();
+            throw new Exception("El correo electrónico ya está registrado");
+        }
+        
+        // Actualizar información
+        $this->dueñoDAO = new DueñoDAO(
+            $this->id,
+            $this->nombre,
+            $this->correo,
+            "",
+            $this->telefono
+            );
+        
+        $conexion->ejecutar($this->dueñoDAO->actualizar());
+        $filasAfectadas = $conexion->filasAfectadas();
+        $conexion->cerrar();
+        
+        return $filasAfectadas > 0;
+    }
     
+    public function cambiarClave($nuevaClave) {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        
+        $this->dueñoDAO = new DueñoDAO($this->id, "", "", $nuevaClave);
+        $conexion->ejecutar($this->dueñoDAO->actualizarClave());
+        $filasAfectadas = $conexion->filasAfectadas();
+        $conexion->cerrar();
+        
+        return $filasAfectadas > 0;
+    }
+    
+    public function verificarClave($claveActual) {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        
+        $this->dueñoDAO = new DueñoDAO($this->id, "", "", $claveActual);
+        $conexion->ejecutar($this->dueñoDAO->verificarClaveActual());
+        $resultado = $conexion->filas() > 0;
+        $conexion->cerrar();
+        
+        return $resultado;
+    }
 
 }

@@ -30,6 +30,32 @@ class DueñoDAO {
     public function consultarTodos() {
         return "SELECT id_dueño, nombre, correo, telefono FROM dueño";
     }
+    
+    public function actualizar() {
+        return "UPDATE dueño SET
+                nombre = '" . $this->nombre . "',
+                correo = '" . $this->correo . "',
+                telefono = " . $this->telefono . "
+                WHERE id_dueño = " . $this->id_dueño;
+    }
+    
+    public function actualizarClave() {
+        return "UPDATE dueño SET
+                clave = '" . md5($this->clave) . "'
+                WHERE id_dueño = " . $this->id_dueño;
+    }
+    
+    public function verificarCorreoExistente() {
+        return "SELECT id_dueño FROM dueño
+                WHERE correo = '" . $this->correo . "'
+                AND id_dueño != " . $this->id_dueño;
+    }
+    
+    public function verificarClaveActual() {
+        return "SELECT id_dueño FROM dueño
+                WHERE id_dueño = " . $this->id_dueño . "
+                AND clave = '" . md5($this->clave) . "'";
+    }
         
 
 

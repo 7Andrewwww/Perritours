@@ -19,10 +19,10 @@ if ($_SESSION["rol"] != "paseador") {
             <img src="<?php echo $paseador->getFotoUrl() ?>" class="rounded-circle"
                 style="width: 100%; max-width: 150px;" alt="Foto de perfil">
 
-            <div class="card m-3 mx-auto" style="max-width: 40rem; background-color: transparent; border: 3px solid #4CAF50;">
-                <div style="border-bottom: 2px dashed #4CAF50;" class="card-header display-6 text-light">
+            <div class="card m-3 mx-auto" style="max-width: 40rem; background-color: transparent; border: 3px solid blueviolet;">
+                 <div style="border-bottom: 2px dashed blueviolet;" class="card-header display-6 text-light">
                     Información
-                </div>
+                </div>>
                 <div class="card-body text-light">
                     <p class="card-text lead"><strong>Rol: </strong>Paseador</p>
                     <p class="lead"><strong>Teléfono: </strong><?php echo $paseador->getTelefono() ?></p>

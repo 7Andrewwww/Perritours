@@ -59,5 +59,87 @@ class Perro {
         $conexion->cerrar();
         return $perros;
     }
+    
+    public static function consultarPorDueño($id_dueño) {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        
+        $perroDAO = new PerroDAO();
+        $conexion->ejecutar($perroDAO->consultarPorDueño($id_dueño));
+        
+        $perros = array();
+        while ($registro = $conexion->registro()) {
+            $perro = new Perro(
+                $registro[0], // id_perro
+                $registro[1], // nombre
+                $registro[2], // raza
+                $registro[3], // foto_url
+                new Dueño($id_dueño) // objeto Dueño
+                );
+            $perros[] = $perro;
+        }
+        
+        $conexion->cerrar();
+        return $perros;
+    }
+    
+    public static function cantidadPorDueño($id_dueño) {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        
+        $perroDAO = new PerroDAO();
+        $conexion->ejecutar($perroDAO->cantidadPorDueño($id_dueño));
+        
+        $resultado = $conexion->registro()[0];
+        $conexion->cerrar();
+        
+        return $resultado;
+    }
+    
+    public static function siguienteId() {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        
+        $perroDAO = new PerroDAO();
+        $conexion->ejecutar($perroDAO->siguienteId());
+        
+        $nextId = $conexion->registro()[0] ?? 1; 
+        $conexion->cerrar();
+        
+        return $nextId;
+    }
+    
+    public function insertar() {
+        $conexion = new Conexion();
+        $conexion->abrir();
+
+        $perroDAO = new PerroDAO();
+        $conexion->ejecutar($perroDAO->siguienteId());
+        $nextId = $conexion->registro()[0] ?? 1; 
+
+        $perroDAO = new PerroDAO(0, $this->nombre, "", "", $this->dueño->getId());
+        $conexion->ejecutar($perroDAO->existePerro($this->nombre, $this->dueño->getId()));
+        
+        if($conexion->filas() > 0) {
+            $conexion->cerrar();
+            throw new Exception("Ya tienes un perro registrado con ese nombre");
+        }
+
+        $perroDAO = new PerroDAO(
+            $nextId,
+            $this->nombre,
+            $this->raza,
+            $this->foto_url,
+            $this->dueño->getId()
+            );
+        
+        $conexion->ejecutar($perroDAO->insertar());
+        $resultado = $conexion->filasAfectadas() > 0;
+        $conexion->cerrar();
+        
+        return $resultado;
+    }
+    
+    
 }
 ?>

@@ -19,7 +19,7 @@ if(isset($_POST['crear'])) {
             
             $nombreArchivo = uniqid() . '_' . basename($_FILES['foto']['name']);
             $rutaCompleta = $directorio . $nombreArchivo;
-
+            
             $tipoArchivo = strtolower(pathinfo($rutaCompleta, PATHINFO_EXTENSION));
             $extensionesPermitidas = array('jpg', 'jpeg', 'png', 'gif');
             
@@ -80,8 +80,9 @@ if(isset($_POST['crear'])) {
                     <form method="post" action="?pid=<?php echo base64_encode("presentacion/paseador/crearPaseador.php") ?>" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="id" class="form-label">ID del Paseador</label>
-                            <input type="text" class="form-control" id="id" name="id" required>
-                            <div class="form-text">El ID será asignado manualmente</div>
+                            <input type="number" class="form-control" id="id" name="id" 
+                                   value="<?php echo Paseador::siguienteId(); ?>" min="1" required>
+                            <div class="form-text">El siguiente ID disponible</div>
                         </div>
                         
                         <div class="mb-3">

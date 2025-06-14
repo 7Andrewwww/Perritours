@@ -145,8 +145,8 @@ $calificacionExistente = $esPaseoPasado ? $paseo->obtenerCalificacionPaseador($i
                         <p class="detail-value"><?php echo htmlspecialchars($horaFormateada) ?></p>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <p class="detail-label">Duración estimada</p>
-                        <p class="detail-value">30 minutos</p>
+                        <p class="detail-label">Duración</p>
+                        <p class="detail-value">60 minutos</p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <p class="detail-label">Tarifa</p>

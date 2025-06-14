@@ -28,5 +28,31 @@ class PerroDAO {
                 WHERE p.id_dueño = " . $id_dueño . "
                 ORDER BY p.nombre";
     }
+    
+    
+    public function cantidadPorDueño($id_dueño) {
+        return "SELECT COUNT(*)
+                FROM perro
+                WHERE id_dueño = " . $id_dueño;
+    }
+    
+    public function insertar() {
+        return "INSERT INTO perro (id_perro, nombre, raza, foto_url, id_dueño)
+                VALUES (" . $this->id_perro . ",
+                       '" . $this->nombre . "',
+                       '" . $this->raza . "',
+                       '" . $this->foto_url . "',
+                       " . $this->id_dueño . ")";
+    }
+    
+    public function siguienteId() {
+        return "SELECT MAX(id_perro) + 1 FROM perro";
+    }
+    
+    public function existePerro($nombre, $id_dueño) {
+        return "SELECT id_perro FROM perro
+                WHERE nombre = '" . $this->nombre . "'
+                AND id_dueño = " . $this->id_dueño;
+    }
 }
 ?>
