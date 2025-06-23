@@ -10,15 +10,6 @@ CREATE TABLE administrador (
     telefono INT
 );
 
--- Tabla: dueño
-CREATE TABLE dueño (
-    id_dueño INT PRIMARY KEY,
-    nombre VARCHAR(45),
-    correo VARCHAR(45),
-    clave VARCHAR(45),
-    telefono INT
-);
-
 -- Tabla: estado_paseador
 CREATE TABLE estado_paseador (
     id_estado INT PRIMARY KEY,
@@ -35,6 +26,15 @@ CREATE TABLE paseador (
     foto_url TEXT,
     id_estado INT,
     FOREIGN KEY (id_estado) REFERENCES estado_paseador(id_estado)
+);
+
+-- Tabla: dueño
+CREATE TABLE dueño (
+    id_dueño INT PRIMARY KEY,
+    nombre VARCHAR(45),
+    correo VARCHAR(45),
+    clave VARCHAR(45),
+    telefono INT
 );
 
 -- Tabla: perro
@@ -57,24 +57,32 @@ CREATE TABLE paseo (
     FOREIGN KEY (id_pas) REFERENCES paseador(id_pas)
 );
 
-CREATE TABLE calificacion_paseo (
+CREATE TABLE calificacion_paseador (
     id_calificacion INT PRIMARY KEY AUTO_INCREMENT,
     id_paseo INT NOT NULL,
-    
-    -- Datos del paseador
     id_paseador INT NOT NULL,
-    puntuacion_paseador TINYINT, 
-    fecha_paseador TIMESTAMP NULL,
-    
-    -- Datos del dueño
     id_dueño INT NOT NULL,
-    puntuacion_dueño TINYINT,
-    comentario_dueño TEXT,
-    fecha_dueño TIMESTAMP NULL,
-    
+    puntuacion TINYINT NOT NULL CHECK (puntuacion BETWEEN 1 AND 5),
+    comentario TEXT NOT NULL,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_paseo) REFERENCES paseo(id_paseo),
     FOREIGN KEY (id_paseador) REFERENCES paseador(id_pas),
-    FOREIGN KEY (id_dueño) REFERENCES dueño(id_dueño)
+    FOREIGN KEY (id_dueño) REFERENCES dueño(id_dueño),
+    UNIQUE KEY unique_paseo_dueño (id_paseo, id_dueño)
+);
+
+CREATE TABLE calificacion_dueño (
+    id_calificacion INT PRIMARY KEY AUTO_INCREMENT,
+    id_paseo INT NOT NULL,
+    id_dueño INT NOT NULL,
+    id_paseador INT NOT NULL,
+    puntuacion TINYINT NOT NULL CHECK (puntuacion BETWEEN 1 AND 5),
+    comentario TEXT NOT NULL,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_paseo) REFERENCES paseo(id_paseo),
+    FOREIGN KEY (id_dueño) REFERENCES dueño(id_dueño),
+    FOREIGN KEY (id_paseador) REFERENCES paseador(id_pas),
+    UNIQUE KEY unique_paseo_paseador (id_paseo, id_paseador)
 );
 
 -- Tabla intermedia: paseo_perro
@@ -84,6 +92,31 @@ CREATE TABLE paseo_perro (
     PRIMARY KEY (id_paseo, id_perro),
     FOREIGN KEY (id_paseo) REFERENCES paseo(id_paseo),
     FOREIGN KEY (id_perro) REFERENCES perro(id_perro)
+);
+
+CREATE TABLE estado_solicitud (
+    id_estado INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(20) NOT NULL COMMENT 'pendiente, aceptada, rechazada, cancelada, completada',
+    descripcion VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE solicitud_paseo (
+    id_solicitud INT AUTO_INCREMENT PRIMARY KEY,
+    id_dueño INT NOT NULL,
+    id_paseador INT NOT NULL,
+    id_perro INT NOT NULL,
+    id_estado INT NOT NULL DEFAULT 1 COMMENT '1=pendiente por defecto',
+    fecha_paseo DATE NOT NULL,
+    hora_inicio TIME NOT NULL,
+    duracion INT NOT NULL COMMENT 'Duración en minutos',
+    ubicacion VARCHAR(255) NOT NULL,
+    instrucciones TEXT,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_dueño) REFERENCES dueño(id_dueño),
+    FOREIGN KEY (id_paseador) REFERENCES paseador(id_pas),
+    FOREIGN KEY (id_perro) REFERENCES perro(id_perro),
+    FOREIGN KEY (id_estado) REFERENCES estado_solicitud(id_estado)
 );
 
 -- Tabla: factura

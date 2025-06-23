@@ -152,30 +152,57 @@ class Paseo {
         return $paseos;
     }
     
-    public function calificar($puntuacion, $idPaseador) {
-        $conexion = new Conexion();
-        $paseoDAO = new PaseoDAO($this->idPaseo);
-        $conexion->abrir();
-        $resultado = $conexion->ejecutar(
-            $paseoDAO->calificarPaseo($this->idPaseo, $idPaseador, $puntuacion)
-            );
-        $conexion->cerrar();
-        return $resultado;
-    }
-    
-    public function obtenerCalificacionPaseador($idPaseador) {
-        $conexion = new Conexion();
-        $paseoDAO = new PaseoDAO($this->idPaseo);
-        $conexion->abrir();
-        $conexion->ejecutar($paseoDAO->obtenerCalificacionPaseador($this->idPaseo, $idPaseador));
-        
-        $calificacion = null;
-        if ($datos = $conexion->registro()) {
-            $calificacion = $datos[0];
+    public function calificarDueño($puntuacion, $idPaseador, $comentario) {
+        if (empty($comentario)) {
+            throw new Exception("El comentario es obligatorio");
         }
         
-        $conexion->cerrar();
-        return $calificacion;
+        if ($puntuacion < 1 || $puntuacion > 5) {
+            throw new Exception("La puntuación debe estar entre 1 y 5");
+        }
+        
+        $conexion = new Conexion();
+        $paseoDAO = new PaseoDAO($this->idPaseo);
+        $conexion->abrir();
+        
+        try {
+            // Obtener el id_dueño asociado al paseo
+            $id_dueño = $this->getDueño()->getId();
+            
+            $resultado = $conexion->ejecutar(
+                $paseoDAO->calificarDueño($this->idPaseo, $id_dueño, $idPaseador, $puntuacion, $comentario)
+                );
+            
+            if (!$resultado) {
+                throw new Exception("Error al guardar la calificación");
+            }
+            
+            return true;
+        } finally {
+            $conexion->cerrar();
+        }
+    }
+    
+    public function obtenerCalificacionDueño($idPaseador) {
+        $conexion = new Conexion();
+        $paseoDAO = new PaseoDAO($this->idPaseo);
+        $conexion->abrir();
+        
+        try {
+            $conexion->ejecutar($paseoDAO->obtenerCalificacionDueño($this->idPaseo, $idPaseador));
+            
+            $calificacion = null;
+            if ($datos = $conexion->registro()) {
+                $calificacion = [
+                    'puntuacion' => $datos[0],
+                    'comentario' => $datos[1] ?? null
+                ];
+            }
+            
+            return $calificacion;
+        } finally {
+            $conexion->cerrar();
+        }
     }
     
     public static function consultarHistorialPaseosDueño($idDueño) {
@@ -199,33 +226,57 @@ class Paseo {
         return $paseos;
     }
     
-    public function calificarDueño($puntuacion, $idDueño, $comentario = null) {
-        $conexion = new Conexion();
-        $paseoDAO = new PaseoDAO($this->idPaseo);
-        $conexion->abrir();
-        $resultado = $conexion->ejecutar(
-            $paseoDAO->calificarPaseoDueño($this->idPaseo, $idDueño, $puntuacion, $comentario)
-            );
-        $conexion->cerrar();
-        return $resultado;
-    }
-    
-    public function obtenerCalificacionDueño($idDueño) {
-        $conexion = new Conexion();
-        $paseoDAO = new PaseoDAO($this->idPaseo);
-        $conexion->abrir();
-        $conexion->ejecutar($paseoDAO->obtenerCalificacionDueño($this->idPaseo, $idDueño));
-        
-        $calificacion = null;
-        if ($datos = $conexion->registro()) {
-            $calificacion = [
-                'puntuacion' => $datos[0],
-                'comentario' => $datos[1]
-            ];
+    public function calificarPaseador($puntuacion, $idPaseador, $comentario) {
+        if (empty($comentario)) {
+            throw new Exception("El comentario es obligatorio");
         }
         
-        $conexion->cerrar();
-        return $calificacion;
+        if ($puntuacion < 1 || $puntuacion > 5) {
+            throw new Exception("La puntuación debe estar entre 1 y 5");
+        }
+        
+        $conexion = new Conexion();
+        $paseoDAO = new PaseoDAO($this->idPaseo);
+        $conexion->abrir();
+        
+        try {
+            // Obtener el id_dueño asociado al paseo
+            $id_dueño = $this->getDueño()->getId();
+            
+            $resultado = $conexion->ejecutar(
+                $paseoDAO->calificarPaseador($this->idPaseo, $idPaseador, $id_dueño, $puntuacion, $comentario)
+                );
+            
+            if (!$resultado) {
+                throw new Exception("Error al guardar la calificación");
+            }
+            
+            return true;
+        } finally {
+            $conexion->cerrar();
+        }
+    }
+    
+    public function obtenerCalificacionPaseador($idPaseador) {
+        $conexion = new Conexion();
+        $paseoDAO = new PaseoDAO($this->idPaseo);
+        $conexion->abrir();
+        
+        try {
+            $conexion->ejecutar($paseoDAO->obtenerCalificacionPaseador($this->idPaseo, $idPaseador));
+            
+            $calificacion = null;
+            if ($datos = $conexion->registro()) {
+                $calificacion = [
+                    'puntuacion' => $datos[0],
+                    'comentario' => $datos[1] ?? null
+                ];
+            }
+            
+            return $calificacion;
+        } finally {
+            $conexion->cerrar();
+        }
     }
 }
 ?>

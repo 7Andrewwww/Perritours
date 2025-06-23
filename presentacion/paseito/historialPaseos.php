@@ -79,6 +79,23 @@ $historialPaseos = Paseo::consultarHistorialPaseos($idPaseador);
     border-radius: 12px;
     padding: 3px 8px;
     font-size: 0.85em;
+    cursor: help;
+    position: relative;
+}
+
+.rating-badge:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    z-index: 100;
+    margin-bottom: 5px;
 }
 
 .btn-calificar {
@@ -92,12 +109,14 @@ $historialPaseos = Paseo::consultarHistorialPaseos($idPaseador);
     transform: translateY(-2px);
 }
 </style>
+
 <body>
     <?php
     include("presentacion/fondo.php");
     include("presentacion/boton.php");
     include("presentacion/paseador/menuPaseador.php");
     ?>
+    
 <div class="text-center py-3 hero-text">
     <div class="container glass py-3">
         <h1 class="display-6">Mi Historial de Paseos</h1>
@@ -131,7 +150,9 @@ $historialPaseos = Paseo::consultarHistorialPaseos($idPaseador);
                             $horaFormateada = date("H:i", strtotime($paseo->getHora()));
                             
                             $esPaseoPasado = strtotime($paseo->getFecha() . ' ' . $paseo->getHora()) < time();
-                            $calificacionExistente = $esPaseoPasado ? $paseo->obtenerCalificacionPaseador($idPaseador) : null;
+                            $calificacionExistente = $esPaseoPasado ? $paseo->obtenerCalificacionDueño($idPaseador) : null;
+                            $puntuacionExistente = $calificacionExistente ? $calificacionExistente['puntuacion'] : null;
+                            $comentarioExistente = $calificacionExistente ? $calificacionExistente['comentario'] : null;
                         ?>
                         <tr>
                             <td><?php echo htmlspecialchars($fechaFormateada) ?></td>
@@ -151,9 +172,9 @@ $historialPaseos = Paseo::consultarHistorialPaseos($idPaseador);
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 <?php if ($esPaseoPasado): ?>
-                                    <?php if ($calificacionExistente): ?>
-                                        <span class="rating-badge" title="Ya calificado">
-                                            <i class="fas fa-star"></i> <?php echo $calificacionExistente ?>
+                                    <?php if ($puntuacionExistente): ?>
+                                        <span class="rating-badge" title="<?php echo htmlspecialchars($comentarioExistente ?? 'Sin comentario') ?>">
+                                            <i class="fas fa-star"></i> <?php echo $puntuacionExistente ?>
                                         </span>
                                     <?php else: ?>
                                         <a href="?pid=<?php echo base64_encode("presentacion/paseador/detallePaseo.php") ?>&idPaseo=<?php echo $paseo->getIdPaseo() ?>" 

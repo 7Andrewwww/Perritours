@@ -1,7 +1,7 @@
 <?php
 $idPaseo = $_GET['idPaseo'] ?? null;
 if (!$idPaseo) {
-    header("Location: ?pid=" . base64_encode("presentacion/paseador/historialPaseos.php"));
+    header("Location: ?pid=" . base64_encode("presentacion/paseitor/historialPaseos.php"));
     exit();
 }
 
@@ -21,7 +21,9 @@ $horaFormateada = date("H:i", strtotime($paseo->getHora()));
 
 // Verificar si es un paseo pasado y obtener calificación
 $esPaseoPasado = strtotime($paseo->getFecha() . ' ' . $paseo->getHora()) < time();
-$calificacionExistente = $esPaseoPasado ? $paseo->obtenerCalificacionPaseador($idPaseador) : null;
+$calificacionExistente = $esPaseoPasado ? $paseo->obtenerCalificacionDueño($idPaseador) : null;
+$puntuacionExistente = $calificacionExistente ? $calificacionExistente['puntuacion'] : null;
+$comentarioExistente = $calificacionExistente ? $calificacionExistente['comentario'] : null;
 ?>
 
 <style>
@@ -106,7 +108,96 @@ $calificacionExistente = $esPaseoPasado ? $paseo->obtenerCalificacionPaseador($i
     background-color: #7B1FA2;
     transform: translateY(-2px);
 }
+
+.rating-stars {
+    display: flex;
+    justify-content: center;
+    direction: rtl;
+    margin-bottom: 20px;
+}
+
+.rating-stars input {
+    display: none;
+}
+
+.rating-stars label {
+    font-size: 2rem;
+    color: #444;
+    cursor: pointer;
+    transition: color 0.2s;
+    margin: 0 5px;
+}
+
+.rating-stars input:checked ~ label,
+.rating-stars input:hover ~ label,
+.rating-stars label:hover,
+.rating-stars label:hover ~ label {
+    color: #ffc107;
+}
+
+.comentario-box {
+    margin-top: 20px;
+}
+
+.comentario-box textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid #6A0DAD;
+    color: white;
+    resize: vertical;
+}
+
+.comentario-box textarea:focus {
+    outline: none;
+    border-color: #9C27B0;
+    box-shadow: 0 0 0 2px rgba(156, 39, 176, 0.3);
+}
+
+.estado-badge {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.estado-completado {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.estado-pendiente {
+    background-color: #FFC107;
+    color: #333;
+}
+
+.pet-avatar {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #6A0DAD;
+}
+
+.detail-label {
+    color: #B388EB;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.detail-value {
+    color: white;
+    font-size: 1.1rem;
+}
+
+.detail-card {
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
 </style>
+
 <body>
     <?php
     include("presentacion/fondo.php");
@@ -188,13 +279,19 @@ $calificacionExistente = $esPaseoPasado ? $paseo->obtenerCalificacionPaseador($i
                     <div class="d-grid gap-2 mt-4">
                         <button class="btn btn-calificar text-light" data-bs-toggle="modal" data-bs-target="#modalCalificar">
                             <i class="fas fa-star me-2"></i>
-                            <?php echo $calificacionExistente ? 'Actualizar calificación' : 'Calificar experiencia' ?>
+                            <?php echo $puntuacionExistente ? 'Actualizar calificación' : 'Calificar experiencia' ?>
                         </button>
-                        <?php if ($calificacionExistente): ?>
+                        <?php if ($puntuacionExistente): ?>
                             <div class="text-center mt-2">
                                 <span class="rating-badge">
-                                    Tu calificación actual: <?php echo $calificacionExistente ?> estrellas
+                                    Tu calificación actual: <?php echo $puntuacionExistente ?> estrellas
                                 </span>
+                                <?php if ($comentarioExistente): ?>
+                                    <div class="mt-2 p-2" style="background: rgba(255,255,255,0.1); border-radius: 8px;">
+                                        <small class="text-muted">Tu comentario:</small>
+                                        <p class="text-light"><?php echo htmlspecialchars($comentarioExistente) ?></p>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -220,7 +317,7 @@ $calificacionExistente = $esPaseoPasado ? $paseo->obtenerCalificacionPaseador($i
                         <div class="rating-stars">
                             <?php for ($i = 5; $i >= 1; $i--): ?>
                                 <input type="radio" id="star<?php echo $i ?>" name="puntuacion" value="<?php echo $i ?>" 
-                                    <?php echo ($calificacionExistente == $i) ? 'checked' : '' ?>>
+                                    <?php echo ($puntuacionExistente == $i) ? 'checked' : '' ?>>
                                 <label for="star<?php echo $i ?>" class="star-label">
                                     <i class="fas fa-star"></i>
                                 </label>
@@ -228,7 +325,12 @@ $calificacionExistente = $esPaseoPasado ? $paseo->obtenerCalificacionPaseador($i
                         </div>
                     </div>
                     
-                    <div class="d-grid gap-2">
+                    <div class="comentario-box">
+                        <label for="comentario" class="text-light mb-2">Comentario (obligatorio)</label>
+                        <textarea id="comentario" name="comentario" placeholder="Escribe tu experiencia con este paseo..." required><?php echo $comentarioExistente ?? '' ?></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save me-2"></i>Guardar Calificación
                         </button>
@@ -238,4 +340,15 @@ $calificacionExistente = $esPaseoPasado ? $paseo->obtenerCalificacionPaseador($i
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('formCalificar').addEventListener('submit', function(e) {
+    const comentario = document.getElementById('comentario').value.trim();
+    if (!comentario) {
+        e.preventDefault();
+        alert('Por favor escribe un comentario antes de enviar la calificación');
+        document.getElementById('comentario').focus();
+    }
+});
+</script>
 </body>

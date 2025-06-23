@@ -58,28 +58,20 @@ class PaseoDAO {
                 WHERE p.id_paseo = " . $this->id_paseo;
     }
     
-    public function calificarPaseo($id_paseo, $id_paseador, $puntuacion) {
-        return "INSERT INTO calificacion_paseo
-            (id_paseo, id_paseador, puntuacion_paseador, fecha_paseador, id_dueño)
-            SELECT
-                $id_paseo,
-                $id_paseador,
-                $puntuacion,
-                NOW(),
-                d.id_dueño
-            FROM paseo p
-            JOIN paseo_perro pp ON p.id_paseo = pp.id_paseo
-            JOIN perro per ON pp.id_perro = per.id_perro
-            JOIN dueño d ON per.id_dueño = d.id_dueño
-            WHERE p.id_paseo = $id_paseo
+    public function calificarDueño($id_paseo, $id_dueño, $id_paseador, $puntuacion, $comentario) {
+        return "INSERT INTO calificacion_dueño
+            (id_paseo, id_dueño, id_paseador, puntuacion, comentario)
+            VALUES
+            ($id_paseo, $id_dueño, $id_paseador, $puntuacion, '$comentario')
             ON DUPLICATE KEY UPDATE
-                puntuacion_paseador = VALUES(puntuacion_paseador),
-                fecha_paseador = VALUES(fecha_paseador)";
+                puntuacion = VALUES(puntuacion),
+                comentario = VALUES(comentario),
+                fecha = CURRENT_TIMESTAMP";
     }
     
-    public function obtenerCalificacionPaseador($id_paseo, $id_paseador) {
-        return "SELECT puntuacion_paseador
-            FROM calificacion_paseo
+    public function obtenerCalificacionDueño($id_paseo, $id_paseador) {
+        return "SELECT puntuacion, comentario
+            FROM calificacion_dueño
             WHERE id_paseo = $id_paseo AND id_paseador = $id_paseador";
     }
     
@@ -112,30 +104,21 @@ class PaseoDAO {
             ORDER BY p.fecha DESC, p.hora DESC";
     }
     
-    public function calificarPaseoDueño($id_paseo, $id_dueño, $puntuacion, $comentario = null) {
-        $comentarioSQL = $comentario !== null ? "'$comentario'" : "NULL";
-        
-        return "INSERT INTO calificacion_paseo
-            (id_paseo, id_paseador, id_dueño, puntuacion_dueño, comentario_dueño, fecha_dueño)
-            SELECT
-                $id_paseo,
-                p.id_pas,
-                $id_dueño,
-                $puntuacion,
-                $comentarioSQL,
-                NOW()
-            FROM paseo p
-            WHERE p.id_paseo = $id_paseo
+    public function calificarPaseador($id_paseo, $id_paseador, $id_dueño, $puntuacion, $comentario) {
+        return "INSERT INTO calificacion_paseador
+            (id_paseo, id_paseador, id_dueño, puntuacion, comentario)
+            VALUES
+            ($id_paseo, $id_paseador, $id_dueño, $puntuacion, '$comentario')
             ON DUPLICATE KEY UPDATE
-                puntuacion_dueño = VALUES(puntuacion_dueño),
-                comentario_dueño = VALUES(comentario_dueño),
-                fecha_dueño = VALUES(fecha_dueño)";
+                puntuacion = VALUES(puntuacion),
+                comentario = VALUES(comentario),
+                fecha = CURRENT_TIMESTAMP";
     }
     
-    public function obtenerCalificacionDueño($id_paseo, $id_dueño) {
-        return "SELECT puntuacion_dueño, comentario_dueño
-            FROM calificacion_paseo
-            WHERE id_paseo = $id_paseo AND id_dueño = $id_dueño";
+    public function obtenerCalificacionPaseador($id_paseo, $id_paseador) {
+        return "SELECT puntuacion, comentario
+            FROM calificacion_paseador
+            WHERE id_paseo = $id_paseo AND id_paseador = $id_paseador";
     }
 }
 ?>

@@ -131,7 +131,7 @@ $historialPaseos = Paseo::consultarHistorialPaseosDueño($idDueño);
                             $horaFormateada = date("H:i", strtotime($paseo->getHora()));
                             
                             $esPaseoPasado = strtotime($paseo->getFecha() . ' ' . $paseo->getHora()) < time();
-                            $calificacionExistente = $esPaseoPasado ? $paseo->obtenerCalificacionDueño($idDueño) : null;
+                            $calificacionExistente = $esPaseoPasado ? $paseo->obtenerCalificacionPaseador($idDueño) : null;
                         ?>
                         <tr>
                             <td><?php echo htmlspecialchars($fechaFormateada) ?></td>
@@ -177,4 +177,4 @@ $historialPaseos = Paseo::consultarHistorialPaseosDueño($idDueño);
         </div>
     </div>
 </div>
-</body> 
+</body>
