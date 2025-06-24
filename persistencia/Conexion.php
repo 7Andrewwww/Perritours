@@ -28,7 +28,9 @@ class Conexion{
         return $this->conexion->affected_rows;
     }
     
-    
+    public function obtenerUltimoId() {
+        return $this->conexion->insert_id;
+    }
 }
 
 

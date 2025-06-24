@@ -54,5 +54,9 @@ class PerroDAO {
                 WHERE nombre = '" . $this->nombre . "'
                 AND id_dueño = " . $this->id_dueño;
     }
+    
+    public function obtenerPorId() {
+        return "SELECT id_perro, nombre, raza, foto_url, id_dueño FROM perro WHERE id_perro = $this->id_perro";
+    }
 }
 ?>

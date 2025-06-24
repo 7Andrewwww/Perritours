@@ -38,6 +38,24 @@ class Perro {
         return $this->dueño;
     }
     
+    public function consultar() {
+        $conexion = new Conexion();
+        $conexion->abrir();
+        
+        $perroDAO = new PerroDAO($this->idPerro);
+        $conexion->ejecutar($perroDAO->obtenerPorId());
+        
+        $datos = $conexion->registro();
+        if ($datos) {
+            $this->nombre = $datos[1];
+            $this->raza = $datos[2];
+            $this->foto_url = $datos[3];
+            $this->dueño = new Dueño($datos[4]);
+        }
+        
+        $conexion->cerrar();
+    }
+    
     public static function consultarTodos() {
         $conexion = new Conexion();
         $perroDAO = new PerroDAO();

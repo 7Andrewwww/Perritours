@@ -36,6 +36,8 @@ $id = $_SESSION["id"];
                     <ul class="dropdown-menu" style="background-color: #23234A;">
                         <li><a class="dropdown-item text-light" href="?pid=<?php echo base64_encode("presentacion/paseito/consultarPaseoPaseador.php") ?>">Paseos Programados</a></li>
                         <li><a class="dropdown-item text-light" href="?pid=<?php echo base64_encode("presentacion/paseito/historialPaseos.php") ?>">Historial de Paseos</a></li>
+                        <li><a class="dropdown-item text-light" href="?pid=<?php echo base64_encode("presentacion/solicitud/verPaseosPaseador.php") ?>">Solicitudes Pendientes</a></li>
+                        
                     </ul>
                 </li>
 

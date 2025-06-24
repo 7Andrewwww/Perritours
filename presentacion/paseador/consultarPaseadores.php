@@ -166,7 +166,7 @@ $paseadoresConExperiencia = Paseador::consultarPaseadoresConExperiencia($idDueñ
                                     <p><i class="bi bi-telephone"></i> <strong>Teléfono:</strong> <?= htmlspecialchars($paseador->getTelefono()) ?></p>
                                     <p><i class="bi bi-envelope"></i> <strong>Correo:</strong> <?= htmlspecialchars($paseador->getCorreo()) ?></p>                                    
                                     <div class="d-grid gap-2 mt-4">
-                                        <a href="?pid=<?= base64_encode("presentacion/paseo/solicitarPaseo.php") ?>&id_paseador=<?= $paseador->getId() ?>" 
+                                        <a href="?pid=<?= base64_encode("presentacion/solicitud/solicitarPaseo.php") ?>&id_paseador=<?= $paseador->getId() ?>" 
                                            class="btn btn-primary btn-lg">
                                             <i class="bi bi-calendar-plus"></i> Solicitar Paseo
                                         </a>

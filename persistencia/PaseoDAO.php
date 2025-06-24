@@ -120,5 +120,7 @@ class PaseoDAO {
             FROM calificacion_paseador
             WHERE id_paseo = $id_paseo AND id_paseador = $id_paseador";
     }
+    
+    
 }
 ?>

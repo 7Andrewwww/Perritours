@@ -5,6 +5,7 @@ require ("logica/Dueño.php");
 require ("logica/Paseador.php");
 require ("logica/Perro.php");
 require ("logica/Paseo.php");
+require ("logica/SolicitudPaseo.php");
 //require ("logica/EstadisticasDueño.php");
 ?>
 <!DOCTYPE html>
@@ -43,6 +44,7 @@ $paginas_con_autenticacion = array(
     "presentacion/paseador/editarMiPerfil.php",
     "presentacion/paseador/guardarCalificacion.php",
     "presentacion/paseador/gestionHorario.php",
+    "presentacion/paseador/detallePaseo.php",
     "presentacion/dueño/consultarDueño.php",
     "presentacion/dueño/editarMiPerfil.php",
     "presentacion/dueño/dashboardDueño.php",
@@ -55,7 +57,12 @@ $paginas_con_autenticacion = array(
     "presentacion/paseito/consultarPaseoPaseador.php",
     "presentacion/paseito/historialPaseos.php",
     "presentacion/paseito/historialMisPaseos.php",
-    "presentacion/paseador/detallePaseo.php",
+    "presentacion/solicitud/solicitarPaseo.php",
+    "presentacion/solicitud/verPaseosDueño.php",
+    "presentacion/solicitud/verPaseosPaseador.php",
+    "presentacion/solicitud/procesarSolicitud.php",
+    "presentacion/solicitud/procesarAceptar.php",
+    "presentacion/solicitud/procesarRechazar.php",
 );
 
 if(!isset($_GET["pid"])){
