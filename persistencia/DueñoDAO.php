@@ -57,6 +57,10 @@ class DueñoDAO {
                 AND clave = '" . md5($this->clave) . "'";
     }
         
-
+    public function obtenerPromedioSatisfaccion() {
+        return "SELECT ROUND(AVG(puntuacion), 1) AS promedio FROM calificacion_dueño";
+    }
+    
+    
 
 }

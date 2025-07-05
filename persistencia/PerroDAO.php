@@ -58,5 +58,11 @@ class PerroDAO {
     public function obtenerPorId() {
         return "SELECT id_perro, nombre, raza, foto_url, id_dueño FROM perro WHERE id_perro = $this->id_perro";
     }
+    
+    public function contarTotal() {
+        return "SELECT COUNT(*) AS total FROM perro";
+    }
+    
+    
 }
 ?>

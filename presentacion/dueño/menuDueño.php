@@ -58,13 +58,6 @@ $id = $_SESSION["id"];
                         Mis Facturas
                     </a>
                 </li>
-                <!-- Dentro de tu menú existente -->
-				<li class="nav-item">
-    				<a class="nav-link" href="?pid=<?php echo base64_encode("presentacion/dueño/dashboardDueño.php") ?>">
-        			<i class="bi bi-speedometer2"></i> Dashboard
-    				</a>
-				</li>
-
             </ul>
             <div class="d-flex">
                 <a href="?pid=<?php echo base64_encode("presentacion/autenticar.php") ?>&sesion=false"

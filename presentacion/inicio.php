@@ -49,18 +49,36 @@ include ("presentacion/fondo.php");
 
   <!-- STATISTICS SECTION -->
   <section id="stats" class="py-5">
-    <div class="container-xl">
-      <div class="row align-items-center glass">
-        <div class="col-md-6">
-          <h2 class="section-title">Estadísticas</h2>
-          <p>Visualiza datos relevantes para el negocio: frecuencia de paseos, ingresos por paseador, calificaciones y más. Presentamos la información de forma clara para que puedas tomar decisiones acertadas.</p>
-        </div>
-        <div class="col-md-6 text-center">
-          <img src="/Perritours/imagenes/analisis.png" class="img-fluid" alt="Estadísticas">
-        </div>
+  <div class="container-xl">
+    <div class="row align-items-center glass">
+      <div class="col-md-6">
+        <h2 class="section-title">Estadísticas</h2>
+        <p>Visualiza datos relevantes para el negocio: frecuencia de paseos, ingresos por paseador, calificaciones y más. Presentamos la información de forma clara para que puedas tomar decisiones acertadas.</p>
+<a href="?pid=<?php echo base64_encode('presentacion/estadisticas/graficas.php'); ?>" 
+   class="btn btn-lg mt-3"
+   style="background: linear-gradient(90deg, #00d8ff, #8a2be2);
+          border: none;
+          border-radius: 12px;
+          color: #ffffff;
+          padding: 10px 26px;
+          font-size: 16px;
+          font-weight: 500;
+          box-shadow: 0 0 8px rgba(0, 216, 255, 0.2);
+          transition: all 0.3s ease;">
+  Ver gráficas detalladas
+</a>
+
+
+
+
+      </div>
+      <div class="col-md-6 text-center">
+        <img src="/Perritours/imagenes/analisis.png" class="img-fluid" alt="Estadísticas">
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
 
   <!-- FOOTER -->
   <footer class="text-center">

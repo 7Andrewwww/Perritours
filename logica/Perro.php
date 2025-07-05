@@ -158,6 +158,18 @@ class Perro {
         return $resultado;
     }
     
+    public static function contarTotal() {
+        $conexion = new Conexion();
+        $dao = new PerroDAO();
+        $conexion->abrir();
+        $conexion->ejecutar($dao->contarTotal());
+        
+        $dato = $conexion->registro();
+        $conexion->cerrar();
+        
+        return $dato ? (int)($dato->total ?? $dato[0]) : 0;
+    }
+    
     
 }
 ?>

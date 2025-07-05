@@ -99,53 +99,41 @@ $misPerros = Perro::consultarPorDueño($_SESSION['id']);
                 </div>
                 
                 <form id="formSolicitud" action="?pid=<?= base64_encode("presentacion/solicitud/procesarSolicitud.php") ?>" method="post">
-                    <input type="hidden" name="id_paseador" value="<?= $idPaseador ?>">
-                    
-                    <div class="perro-select-group">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Perro 1 (Obligatorio)</label>
-                                <select class="form-select perro-select" name="id_perro[]" required>
-                                    <option value="">Seleccione su perro</option>
-                                    <?php foreach($misPerros as $perro): ?>
-                                    <option value="<?= $perro->getIdPerro() ?>">
-                                        <?= htmlspecialchars($perro->getNombre()) ?> (<?= htmlspecialchars($perro->getRaza()) ?>)
-                                    </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Perro 2 (Opcional)</label>
-                                <select class="form-select perro-select" name="id_perro[]">
-                                    <option value="">Ningún perro adicional</option>
-                                    <?php foreach($misPerros as $perro): ?>
-                                    <option value="<?= $perro->getIdPerro() ?>">
-                                        <?= htmlspecialchars($perro->getNombre()) ?> (<?= htmlspecialchars($perro->getRaza()) ?>)
-                                    </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <div class="error-message" id="error-perros">No puedes seleccionar el mismo perro dos veces</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-4">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Fecha</label>
-                            <input type="date" class="form-control" name="fecha" min="<?= date('Y-m-d') ?>" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Hora</label>
-                            <input type="time" class="form-control" name="hora" required>
-                        </div>
-                    </div>
-                    
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-solicitar btn-lg text-light">
-                            <i class="fas fa-paper-plane me-2"></i> Enviar Solicitud
-                        </button>
-                    </div>
-                </form>
+    <input type="hidden" name="id_paseador" value="<?= $idPaseador ?>">
+
+    <div class="perro-select-group">
+        <div class="row">
+            <div class="col-md-12 mb-3">
+                <label class="form-label">Selecciona tu perro</label>
+                <select class="form-select" name="id_perro" required>
+                    <option value="">Seleccione su perro</option>
+                    <?php foreach($misPerros as $perro): ?>
+                    <option value="<?= $perro->getIdPerro() ?>">
+                        <?= htmlspecialchars($perro->getNombre()) ?> (<?= htmlspecialchars($perro->getRaza()) ?>)
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Fecha</label>
+            <input type="date" class="form-control" name="fecha" min="<?= date('Y-m-d') ?>" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Hora</label>
+            <input type="time" class="form-control" name="hora" required>
+        </div>
+    </div>
+
+    <div class="d-grid mt-4">
+        <button type="submit" class="btn btn-solicitar btn-lg text-light">
+            <i class="fas fa-paper-plane me-2"></i> Enviar Solicitud
+        </button>
+    </div>
+</form>
             </div>
         </div>
     </div>

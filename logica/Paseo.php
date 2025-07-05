@@ -278,5 +278,86 @@ class Paseo {
             $conexion->cerrar();
         }
     }
+    
+    public static function consultarPorDueño($idDueño) {
+        $conexion = new Conexion();
+        $paseoDAO = new PaseoDAO();
+        $conexion->abrir();
+        $conexion->ejecutar($paseoDAO->consultarPaseosPorDueño($idDueño));
+        
+        $paseos = [];
+        
+        while ($datos = $conexion->registro()) {
+            $paseo = new Paseo(
+                $datos[0], // id_paseo
+                $datos[1], // tarifa
+                $datos[2], // fecha
+                $datos[3], // hora
+                new Paseador($datos[4], $datos[5]), // Paseador
+                null, // Dueño no es necesario para esta vista
+                new Perro($datos[6], $datos[7], $datos[8]) // Perro
+                );
+            array_push($paseos, $paseo);
+        }
+        
+        $conexion->cerrar();
+        return $paseos;
+    }
+    
+    public static function obtenerCrecimientoMensual() {
+        $conexion = new Conexion();
+        $dao = new PaseoDAO();
+        $conexion->abrir();
+        $conexion->ejecutar($dao->obtenerCrecimientoMensual());
+        
+        $datos = [['Mes', 'Paseos']]; // Encabezados para Google Charts
+        while ($fila = $conexion->registro()) {
+            $datos[] = [$fila->mes ?? $fila[0], (int)($fila->cantidad ?? $fila[1])];
+        }
+        
+        $conexion->cerrar();
+        return $datos;
+    }
+    
+    public static function obtenerMomentosPopulares() {
+        $conexion = new Conexion();
+        $dao = new PaseoDAO();
+        $conexion->abrir();
+        $conexion->ejecutar($dao->obtenerMomentosPopulares());
+        
+        $datos = [['Franja', 'Cantidad']]; // Encabezados para Google Charts
+        while ($fila = $conexion->registro()) {
+            $datos[] = [$fila->franja ?? $fila[0], (int)($fila->cantidad ?? $fila[1])];
+        }
+        
+        $conexion->cerrar();
+        return $datos;
+    }
+    
+    public static function obtenerPromedioTarifas() {
+        $conexion = new Conexion();
+        $dao = new PaseoDAO();
+        $conexion->abrir();
+        $conexion->ejecutar($dao->obtenerPromedioTarifas());
+        
+        $dato = $conexion->registro();
+        $conexion->cerrar();
+        
+        return $dato ? (float)($dato->promedio ?? $dato[0]) : 0;
+    }
+    
+    public static function contarTotalPaseos() {
+        $conexion = new Conexion();
+        $dao = new PaseoDAO();
+        $conexion->abrir();
+        $conexion->ejecutar($dao->contarTotalPaseos());
+        
+        $dato = $conexion->registro();
+        $conexion->cerrar();
+        
+        return $dato ? (int)($dato->total ?? $dato[0]) : 0;
+    }
+    
+    
 }
 ?>

@@ -134,10 +134,10 @@ class SolicitudPaseoDAO {
     // Método para que el paseador rechace una solicitud
     public function rechazarSolicitud() {
         return "UPDATE solicitud_paseo
-                SET id_estado = 3
-                WHERE id_solicitud = $this->id_solicitud
-                AND id_paseador = $this->id_paseador";
+            SET id_estado = 3
+            WHERE id_solicitud = $this->id_solicitud";
     }
+    
     
     // Método para que el dueño cancele una solicitud
     public function cancelarSolicitud() {
@@ -162,5 +162,12 @@ class SolicitudPaseoDAO {
                 $idPaseador
               )";
     }
+    
+    public function relacionarPaseoPerro($idPaseo, $idPerro) {
+        return "INSERT INTO paseo_perro (id_paseo, id_perro)
+            VALUES ($idPaseo, $idPerro)";
+    }
+    
+    
 }
 ?>

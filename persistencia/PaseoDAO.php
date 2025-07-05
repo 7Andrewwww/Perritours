@@ -121,6 +121,50 @@ class PaseoDAO {
             WHERE id_paseo = $id_paseo AND id_paseador = $id_paseador";
     }
     
+    public function consultarPaseosPorDueño($idDueño) {
+        return "
+        SELECT DISTINCT p.id_paseo, p.tarifa, p.fecha, p.hora,
+                        pas.id_pas, pas.nombre,
+                        pe.id_perro, pe.nombre, pe.raza
+        FROM paseo p
+        INNER JOIN paseo_perro pp ON p.id_paseo = pp.id_paseo
+        INNER JOIN perro pe ON pp.id_perro = pe.id_perro
+        INNER JOIN paseador pas ON p.id_pas = pas.id_pas
+        WHERE pe.id_dueño = $idDueño
+        ORDER BY p.fecha DESC, p.hora DESC
+    ";
+    }
+    
+    // En PaseoDAO
+    public function obtenerCrecimientoMensual() {
+        return "SELECT DATE_FORMAT(fecha, '%Y-%m') AS mes, COUNT(*) AS cantidad
+        FROM paseo
+        GROUP BY mes
+        ORDER BY mes ASC";
+    }
+    
+    public function obtenerMomentosPopulares() {
+        return "SELECT
+            CASE
+                WHEN HOUR(hora) BETWEEN 6 AND 11 THEN 'Mañana'
+                WHEN HOUR(hora) BETWEEN 12 AND 17 THEN 'Tarde'
+                WHEN HOUR(hora) BETWEEN 18 AND 22 THEN 'Noche'
+                ELSE 'Madrugada'
+            END AS franja,
+            COUNT(*) AS cantidad
+        FROM paseo
+        GROUP BY franja
+        ORDER BY cantidad DESC";
+    }
+    
+    public function obtenerPromedioTarifas() {
+        return "SELECT ROUND(AVG(tarifa), 2) AS promedio FROM paseo";
+    }
+    
+    public function contarTotalPaseos() {
+        return "SELECT COUNT(*) AS total FROM paseo";
+    }
+    
     
 }
 ?>

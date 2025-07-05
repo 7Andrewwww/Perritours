@@ -177,51 +177,92 @@ class SolicitudPaseo {
         $conexion = new Conexion();
         $conexion->abrir();
         
+        $resultado = [
+            'success' => false,
+            'message' => '',
+            'id_paseo' => null,
+            'errors' => []
+        ];
+        
         try {
-            // Iniciar transacción
-            $conexion->ejecutar("START TRANSACTION");
-            
-            // 1. Actualizar estado de la solicitud
-            $solicitudDAO = new SolicitudPaseoDAO();
+            // 1. Cambiar estado de la solicitud
+            $solicitudDAO = new SolicitudPaseoDAO($this->idSolicitud);
             $conexion->ejecutar($solicitudDAO->aceptarSolicitud($this->idSolicitud));
+            if ($conexion->filasAfectadas() <= 0) {
+                throw new Exception("No se pudo actualizar el estado de la solicitud");
+            }
+            
+            $resultado['message'] = "Estado de solicitud actualizado a 'Aceptado'";
             
             // 2. Obtener próximo ID de paseo
             $conexion->ejecutar($solicitudDAO->obtenerProximoIdPaseo());
-            $idPaseo = $conexion->registro()[0];
+            $idData = $conexion->registro();
             
-            // 3. Crear nuevo paseo
-            $conexion->ejecutar($solicitudDAO->crearPaseo(
-                $idPaseo,
-                $tarifa,
-                $this->fecha,
-                $this->hora,
-                $this->paseador->getId()
-                ));
+            if ($idData && isset($idData[0])) {
+                $proximoId = $idData[0];
+            } else {
+                throw new Exception("No se pudo obtener el ID para el nuevo paseo");
+            }
             
-            // Confirmar transacción
-            $conexion->ejecutar("COMMIT");
-            $conexion->cerrar();
-            return true;
+            $resultado['id_paseo'] = $proximoId;
+            
+            // 3. Crear el paseo
+            $paseoDAO = new SolicitudPaseoDAO();
+            $conexion->ejecutar(
+                $paseoDAO->crearPaseo(
+                    $proximoId,
+                    $tarifa,
+                    $this->fecha,
+                    $this->hora,
+                    $this->paseador->getId()
+                    )
+                );
+            
+            if ($conexion->filasAfectadas() <= 0) {
+                throw new Exception("No se pudo crear el registro en la tabla paseo");
+            }
+            
+            $resultado['message'] .= " | Paseo creado exitosamente";
+            
+            // 4. Relacionar paseo con perro
+            $conexion->ejecutar(
+                $paseoDAO->relacionarPaseoPerro($proximoId, $this->perro->getIdPerro())
+                );
+            
+            if ($conexion->filasAfectadas() <= 0) {
+                throw new Exception("No se pudo relacionar el paseo con el perro");
+            }
+            
+            $resultado['message'] .= " | Relación paseo-perro establecida";
+            $resultado['success'] = true;
             
         } catch (Exception $e) {
-            // Revertir en caso de error
-            $conexion->ejecutar("ROLLBACK");
+            $resultado['errors'][] = [
+                'step' => 'aceptar_paseo',
+                'message' => $e->getMessage()
+            ];
+            error_log("Error en aceptar(): " . $e->getMessage());
+        } finally {
             $conexion->cerrar();
-            error_log("Error al aceptar solicitud: " . $e->getMessage());
-            return false;
         }
-    }
-    
-    public function rechazar() {
-        $conexion = new Conexion();
-        $solicitudDAO = new SolicitudPaseoDAO($this->idSolicitud);
-        
-        $conexion->abrir();
-        $resultado = $conexion->ejecutar($solicitudDAO->rechazarSolicitud());
-        $conexion->cerrar();
         
         return $resultado;
     }
+    
+    
+    public function rechazar() {
+        $conexion = new Conexion();
+        $solicitudDAO = new SolicitudPaseoDAO($this->idSolicitud, $this->paseador->getId());
+        
+        $conexion->abrir();
+        $conexion->ejecutar($solicitudDAO->rechazarSolicitud());
+        $filasAfectadas = $conexion->filasAfectadas(); 
+        $conexion->cerrar();
+        
+        return $filasAfectadas > 0;
+    }
+    
+    
     
     public function cancelar() {
         $conexion = new Conexion();

@@ -105,5 +105,19 @@ class Dueño extends Persona {
         
         return $resultado;
     }
+    
+    public static function obtenerPromedioSatisfaccion() {
+        $conexion = new Conexion();
+        $dao = new DueñoDAO();
+        $conexion->abrir();
+        $conexion->ejecutar($dao->obtenerPromedioSatisfaccion());
+        
+        $dato = $conexion->registro();
+        $conexion->cerrar();
+        
+        return $dato ? (float)($dato->promedio ?? $dato[0]) : 0;
+    }
+    
+    
 
 }

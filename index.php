@@ -23,6 +23,7 @@ require ("logica/SolicitudPaseo.php");
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body>
 <?php 
@@ -31,6 +32,7 @@ $paginas_sin_autenticacion = array(
     "presentacion/autenticar.php",
     "presentacion/noAutorizado.php",
     "presentacion/error.php",
+    "presentacion/estadisticas/graficas.php",
 );
 
 $paginas_con_autenticacion = array(
@@ -63,6 +65,7 @@ $paginas_con_autenticacion = array(
     "presentacion/solicitud/procesarSolicitud.php",
     "presentacion/solicitud/procesarAceptar.php",
     "presentacion/solicitud/procesarRechazar.php",
+    "presentacion/factura/consultarFacturas.php",
 );
 
 if(!isset($_GET["pid"])){
