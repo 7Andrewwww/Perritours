@@ -13,7 +13,7 @@ if(isset($_GET['idPaseador']) && !empty($_GET['idPaseador'])) {
     
     try {
         $paseador->consultar();
-
+        
         if(empty($paseador->getNombre())) {
             throw new Exception("Paseador no encontrado");
         }
@@ -28,7 +28,7 @@ if(isset($_GET['idPaseador']) && !empty($_GET['idPaseador'])) {
 if(isset($_POST['actualizar']) && $paseador !== null) {
     try {
         $foto_url = $paseador->getFotoUrl();
-
+        
         if(isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
             $directorio = "img/paseadores/";
             if(!is_dir($directorio)) {
@@ -43,7 +43,6 @@ if(isset($_POST['actualizar']) && $paseador !== null) {
             
             if(in_array($tipoArchivo, $extensionesPermitidas)) {
                 if(move_uploaded_file($_FILES['foto']['tmp_name'], $rutaCompleta)) {
-
                     if($foto_url != 'img/default-profile.png' && file_exists($foto_url)) {
                         unlink($foto_url);
                     }
@@ -55,12 +54,11 @@ if(isset($_POST['actualizar']) && $paseador !== null) {
                 throw new Exception("Solo se permiten archivos JPG, JPEG, PNG o GIF");
             }
         }
-
+        
         $paseador->setNombre($_POST['nombre']);
         $paseador->setCorreo($_POST['correo']);
         $paseador->setTelefono($_POST['telefono']);
         $paseador->setFotoUrl($foto_url);
-        $paseador->setEstado(new Estado($_POST['estado'], ""));
         
         if($paseador->actualizar()) {
             $mensaje = "Paseador actualizado exitosamente";
@@ -90,12 +88,39 @@ if(isset($_POST['actualizarClave']) && $paseador !== null) {
 }
 ?>
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Paseador</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        .hero-text {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .estado-btn.active {
+            font-weight: bold;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
 <body>
     <?php
     include ("presentacion/fondo.php");
     include ("presentacion/boton.php");
     include("presentacion/admin/menuAdmin.php");
     ?>
+    
     <div class="text-center py-3 hero-text">
         <div class="container glass py-3">
             <h1 class="display-6">Editar Paseador</h1>
@@ -141,19 +166,22 @@ if(isset($_POST['actualizarClave']) && $paseador !== null) {
                                 <?php endif; ?>
                             </div>
                             
-                            <div class="mb-3">
-                                <label for="estado" class="form-label">Estado</label>
-                                <select class="form-select" id="estado" name="estado" required>
-                                    <option value="1" <?php echo $paseador->getEstado()->getIdEstado() == 1 ? 'selected' : '' ?>>Activo</option>
-                                    <option value="2" <?php echo $paseador->getEstado()->getIdEstado() == 2 ? 'selected' : '' ?>>Inactivo</option>
-                                    <option value="3" <?php echo $paseador->getEstado()->getIdEstado() == 3 ? 'selected' : '' ?>>Suspendido</option>
-                                    <option value="4" <?php echo $paseador->getEstado()->getIdEstado() == 4 ? 'selected' : '' ?>>Vacacionando</option>
-                                    <option value="4" <?php echo $paseador->getEstado()->getIdEstado() == 5 ? 'selected' : '' ?>>Inhabilitado</option>
-                                </select>
-                            </div>
-                            
                             <button type="submit" name="actualizar" class="btn btn-primary">Actualizar Datos</button>
                         </form>
+                        
+                        <hr class="my-4" style="border-color: blueviolet;">
+
+                        <div class="mb-3 border-top pt-3">
+                            <h5>Estado Actual del Paseador</h5>
+                            <div id="estadoContainer" class="d-flex flex-wrap gap-2 mt-2">
+                                <button type="button" class="btn estado-btn <?php echo $paseador->getEstado()->getIdEstado() == 1 ? 'btn-success active' : 'btn-outline-success' ?>" data-estado="1">Activo</button>
+                                <button type="button" class="btn estado-btn <?php echo $paseador->getEstado()->getIdEstado() == 2 ? 'btn-secondary active' : 'btn-outline-secondary' ?>" data-estado="2">Inactivo</button>
+                                <button type="button" class="btn estado-btn <?php echo $paseador->getEstado()->getIdEstado() == 3 ? 'btn-warning active' : 'btn-outline-warning' ?>" data-estado="3">Suspendido</button>
+                                <button type="button" class="btn estado-btn <?php echo $paseador->getEstado()->getIdEstado() == 4 ? 'btn-info active' : 'btn-outline-info' ?>" data-estado="4">Vacacionando</button>
+                                <button type="button" class="btn estado-btn <?php echo $paseador->getEstado()->getIdEstado() == 5 ? 'btn-danger active' : 'btn-outline-danger' ?>" data-estado="5">Inhabilitado</button>
+                            </div>
+                            <div id="estadoFeedback" class="mt-2"></div>
+                        </div>
                         
                         <hr class="my-4" style="border-color: blueviolet;">
                         
@@ -181,4 +209,75 @@ if(isset($_POST['actualizarClave']) && $paseador !== null) {
             <?php endif; ?>
         </div>
     </div>
+    <?php if ($paseador !== null): ?>
+    <script>
+    $(document).ready(function(){
+        // Función para cambiar el estado
+        function cambiarEstado(nuevoEstado) {
+            var idPaseador = <?php echo $paseador->getId(); ?>;
+            var estadoContainer = $("#estadoContainer");
+            var feedback = $("#estadoFeedback");
+            
+            // Mostrar feedback visual de carga
+            feedback.html('<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Actualizando estado...</div>');
+            
+            // Deshabilitar botones temporalmente
+            estadoContainer.find('.estado-btn').prop('disabled', true);
+            
+            $.ajax({
+                url: "actualizarEstadoPaseador.php",
+                method: "GET",
+                data: {
+                    idPaseador: idPaseador,
+                    idNuevoEstado: nuevoEstado
+                },
+                success: function(response){
+                    // Actualizar la interfaz
+                    estadoContainer.find('.estado-btn').removeClass('active btn-success btn-secondary btn-warning btn-info btn-danger')
+                        .addClass('btn-outline-success btn-outline-secondary btn-outline-warning btn-outline-info btn-outline-danger');
+                    
+                    var botonActual = estadoContainer.find('[data-estado="' + nuevoEstado + '"]');
+                    var claseActiva = '';
+                    
+                    switch(nuevoEstado) {
+                        case '1': claseActiva = 'btn-success'; break;
+                        case '2': claseActiva = 'btn-secondary'; break;
+                        case '3': claseActiva = 'btn-warning'; break;
+                        case '4': claseActiva = 'btn-info'; break;
+                        case '5': claseActiva = 'btn-danger'; break;
+                    }
+                    
+                    botonActual.removeClass('btn-outline-' + claseActiva.split('-')[1])
+                              .addClass(claseActiva + ' active');
+                    
+                    // Mostrar feedback positivo
+                    feedback.html('<div class="alert alert-success">Estado actualizado correctamente' + response + '</div>');
+                    
+                    // Ocultar feedback después de 3 segundos
+                    setTimeout(function(){
+                        feedback.empty();
+                    }, 3000);
+                },
+                error: function(xhr, status, error){
+                    // Mostrar feedback de error
+                    feedback.html('<div class="alert alert-danger">Error al actualizar el estado: ' + error + '</div>');
+                },
+                complete: function(){
+                    // Rehabilitar botones
+                    estadoContainer.find('.estado-btn').prop('disabled', false);
+                }
+            });
+        }
+        
+        // Manejar clic en los botones de estado
+        $(".estado-btn").click(function(){
+            if(!$(this).hasClass('active')) {
+                var nuevoEstado = $(this).data('estado');
+                cambiarEstado(nuevoEstado);
+            }
+        });
+    });
+    </script>
+    <?php endif; ?>
 </body>
+</html>

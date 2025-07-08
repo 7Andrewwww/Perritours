@@ -6,7 +6,6 @@ require ("logica/Paseador.php");
 require ("logica/Perro.php");
 require ("logica/Paseo.php");
 require ("logica/SolicitudPaseo.php");
-//require ("logica/EstadisticasDueño.php");
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -33,6 +32,7 @@ $paginas_sin_autenticacion = array(
     "presentacion/noAutorizado.php",
     "presentacion/error.php",
     "presentacion/estadisticas/graficas.php",
+    "presentacion/paseador/actualizarEstadoPaseador.php",
 );
 
 $paginas_con_autenticacion = array(
@@ -47,6 +47,7 @@ $paginas_con_autenticacion = array(
     "presentacion/paseador/guardarCalificacion.php",
     "presentacion/paseador/gestionHorario.php",
     "presentacion/paseador/detallePaseo.php",
+
     "presentacion/dueño/consultarDueño.php",
     "presentacion/dueño/editarMiPerfil.php",
     "presentacion/dueño/dashboardDueño.php",

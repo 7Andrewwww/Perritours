@@ -185,7 +185,6 @@ class SolicitudPaseo {
         ];
         
         try {
-            // 1. Cambiar estado de la solicitud
             $solicitudDAO = new SolicitudPaseoDAO($this->idSolicitud);
             $conexion->ejecutar($solicitudDAO->aceptarSolicitud($this->idSolicitud));
             if ($conexion->filasAfectadas() <= 0) {
@@ -194,7 +193,6 @@ class SolicitudPaseo {
             
             $resultado['message'] = "Estado de solicitud actualizado a 'Aceptado'";
             
-            // 2. Obtener próximo ID de paseo
             $conexion->ejecutar($solicitudDAO->obtenerProximoIdPaseo());
             $idData = $conexion->registro();
             
@@ -206,7 +204,6 @@ class SolicitudPaseo {
             
             $resultado['id_paseo'] = $proximoId;
             
-            // 3. Crear el paseo
             $paseoDAO = new SolicitudPaseoDAO();
             $conexion->ejecutar(
                 $paseoDAO->crearPaseo(
@@ -224,7 +221,6 @@ class SolicitudPaseo {
             
             $resultado['message'] .= " | Paseo creado exitosamente";
             
-            // 4. Relacionar paseo con perro
             $conexion->ejecutar(
                 $paseoDAO->relacionarPaseoPerro($proximoId, $this->perro->getIdPerro())
                 );

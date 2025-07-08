@@ -134,8 +134,7 @@ class PaseoDAO {
         ORDER BY p.fecha DESC, p.hora DESC
     ";
     }
-    
-    // En PaseoDAO
+
     public function obtenerCrecimientoMensual() {
         return "SELECT DATE_FORMAT(fecha, '%Y-%m') AS mes, COUNT(*) AS cantidad
         FROM paseo

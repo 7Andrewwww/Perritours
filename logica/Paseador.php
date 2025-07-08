@@ -204,13 +204,13 @@ class Paseador extends Persona {
         $paseadores = array();
         while($datos = $conexion->registro()) {
             $paseador = new Paseador(
-                $datos[0],  // id_pas
-                $datos[1],  // nombre
-                $datos[2],  // correo
-                "",         // clave (no se necesita)
-                $datos[3],  // telefono
-                $datos[4],  // foto_url
-                new Estado($datos[5], $datos[6]) // id_estado, estado
+                $datos[0], 
+                $datos[1], 
+                $datos[2], 
+                "",         
+                $datos[3],  
+                $datos[4],  
+                new Estado($datos[5], $datos[6]) 
                 );
             array_push($paseadores, $paseador);
         }
@@ -218,5 +218,14 @@ class Paseador extends Persona {
         $conexion->cerrar();
         return $paseadores;
     }
+    
+    public function actualizarEstado($idEstado){
+        $conexion = new Conexion();
+        $paseadorDAO = new PaseadorDAO($this->id);
+        $conexion->abrir();
+        $conexion->ejecutar($paseadorDAO->actualizarEstado($idEstado));
+        $conexion->cerrar();
+    }
+    
 }
 ?>

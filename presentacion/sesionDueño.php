@@ -7,7 +7,6 @@ if ($_SESSION["rol"] != "dueño") {
 <body>
     <?php
     include("presentacion/fondo.php");
-    include("presentacion/boton.php");
     include("presentacion/dueño/menuDueño.php");
     $id = $_SESSION["id"];
     $dueño = new Dueño($id);

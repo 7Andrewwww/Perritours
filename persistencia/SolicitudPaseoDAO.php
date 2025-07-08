@@ -29,7 +29,6 @@ class SolicitudPaseoDAO {
             $this->fecha_creacion = $fecha_creacion;
     }
     
-    // Método para crear una nueva solicitud
     public function crearSolicitud() {
         return "INSERT INTO solicitud_paseo (
             id_dueño,
@@ -116,7 +115,7 @@ class SolicitudPaseoDAO {
         ORDER BY s.fecha_paseo DESC, s.hora_inicio DESC";
     }
     
-    // Método para actualizar el estado de una solicitud
+
     public function actualizarEstado($nuevoEstado) {
         return "UPDATE solicitud_paseo
                 SET id_estado = $nuevoEstado
@@ -130,16 +129,14 @@ class SolicitudPaseoDAO {
     public function obtenerProximoIdPaseo() {
         return "SELECT IFNULL(MAX(id_paseo), 0) + 1 FROM paseo";
     }
-    
-    // Método para que el paseador rechace una solicitud
+
     public function rechazarSolicitud() {
         return "UPDATE solicitud_paseo
             SET id_estado = 3
             WHERE id_solicitud = $this->id_solicitud";
     }
     
-    
-    // Método para que el dueño cancele una solicitud
+
     public function cancelarSolicitud() {
         return "UPDATE solicitud_paseo
                 SET id_estado = 4

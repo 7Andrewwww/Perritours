@@ -112,5 +112,11 @@ class PaseadorDAO {
             ORDER BY p.nombre";
     }
     
+    public function actualizarEstado($idEstado){
+        return "UPDATE paseador
+            SET id_estado = '" . $idEstado . "'
+            WHERE id_pas = '" . $this->id_pas . "'";
+    }
+    
 }
 ?>

@@ -57,16 +57,14 @@ class Dueño extends Persona {
     public function actualizarInformacion() {
         $conexion = new Conexion();
         $conexion->abrir();
-        
-        // Verificar si el correo ya existe en otro dueño
+
         $this->dueñoDAO = new DueñoDAO($this->id, "", $this->correo);
         $conexion->ejecutar($this->dueñoDAO->verificarCorreoExistente());
         if($conexion->filas() > 0) {
             $conexion->cerrar();
             throw new Exception("El correo electrónico ya está registrado");
         }
-        
-        // Actualizar información
+
         $this->dueñoDAO = new DueñoDAO(
             $this->id,
             $this->nombre,

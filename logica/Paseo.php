@@ -240,7 +240,6 @@ class Paseo {
         $conexion->abrir();
         
         try {
-            // Obtener el id_dueño asociado al paseo
             $id_dueño = $this->getDueño()->getId();
             
             $resultado = $conexion->ejecutar(
@@ -289,13 +288,13 @@ class Paseo {
         
         while ($datos = $conexion->registro()) {
             $paseo = new Paseo(
-                $datos[0], // id_paseo
-                $datos[1], // tarifa
-                $datos[2], // fecha
-                $datos[3], // hora
-                new Paseador($datos[4], $datos[5]), // Paseador
-                null, // Dueño no es necesario para esta vista
-                new Perro($datos[6], $datos[7], $datos[8]) // Perro
+                $datos[0], 
+                $datos[1], 
+                $datos[2], 
+                $datos[3], 
+                new Paseador($datos[4], $datos[5]),
+                null, 
+                new Perro($datos[6], $datos[7], $datos[8])
                 );
             array_push($paseos, $paseo);
         }
@@ -325,7 +324,7 @@ class Paseo {
         $conexion->abrir();
         $conexion->ejecutar($dao->obtenerMomentosPopulares());
         
-        $datos = [['Franja', 'Cantidad']]; // Encabezados para Google Charts
+        $datos = [['Franja', 'Cantidad']]; 
         while ($fila = $conexion->registro()) {
             $datos[] = [$fila->franja ?? $fila[0], (int)($fila->cantidad ?? $fila[1])];
         }
